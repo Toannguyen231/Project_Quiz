@@ -110,9 +110,9 @@ Project_Quiz/
 ## 🚀 Getting Started
 
 ### 1. Prerequisites
-- **Node.js**: `16.x` or later (tested up to `20.x`)
+- **Node.js**: `16.x` or later (tested up to `24.x`)
 - **npm**: `8.x` or later
-- **Backend API Server**: Ensure your Node.js/Express quiz backend is running on `http://localhost:8081`
+- **Backend**: Integrated Express + SQLite in `server/` (chạy song song qua proxy)
 
 ### 2. Clone the Repository
 ```bash
@@ -122,16 +122,31 @@ cd Project_Quiz
 
 ### 3. Install Dependencies
 ```bash
-npm install
+npm install --legacy-peer-deps
 ```
 
-### 4. Run Development Server
+### 4. Environment Setup
+- Frontend configuration: `.env` (mặc định cổng `PORT=3002`)
+- Backend configuration: `server/.env` (tham khảo `server/.env.example`, mặc định cổng `PORT=3001`)
+
+### 5. Run Full-Stack Development Server
+Chạy đồng thời cả **Backend (Express - 3001)** và **Frontend (React - 3002)**:
+```bash
+npm run dev
+```
+- **Backend Healthcheck**: `http://localhost:3001/api/v1/health`
+- **Frontend App**: `http://localhost:3002` (mọi request tới `/api/v1/*` được tự động proxy sang backend 3001)
+
+Nếu chỉ muốn chạy riêng frontend:
 ```bash
 npm start
 ```
-The application will launch automatically at **`http://localhost:3000`**.
+Nếu chỉ muốn chạy riêng backend:
+```bash
+npm run server
+```
 
-### 5. Build for Production
+### 6. Build for Production
 ```bash
 npm run build
 ```
