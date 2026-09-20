@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FaYoutube, FaGithub, FaPaperPlane, FaRedo, FaTimes } from 'react-icons/fa';
 import { SiZalo } from 'react-icons/si';
 import mascotImg from '../../accets/quizzy-mascot.jpg';
-import { askQuizzyAI } from '../sevices/quizzyAiService';
+import { askQuizzyAI, QUIZZY_EVENT_ASK } from '../sevices/quizzyAiService';
 import './MascotCompanion.scss';
 
 const QUICK_PROMPTS = [
@@ -31,6 +31,16 @@ const MascotCompanion = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     const messagesEndRef = useRef(null);
+    const messagesRef = useRef(messages);
+    const isLoadingRef = useRef(isLoading);
+
+    useEffect(() => {
+        messagesRef.current = messages;
+    }, [messages]);
+
+    useEffect(() => {
+        isLoadingRef.current = isLoading;
+    }, [isLoading]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -64,14 +74,14 @@ const MascotCompanion = () => {
         setShowBubble(false);
     };
 
-    const handleSendMessage = async (textToSend) => {
-        const text = textToSend || inputText;
-        if (!text.trim() || isLoading) return;
+    const handleSendMessage = useCallback(async (textToSend) => {
+        const text = (typeof textToSend === 'string' ? textToSend : inputText).trim();
+        if (!text || isLoadingRef.current) return;
 
         const userMsg = {
             id: Date.now(),
             role: 'user',
-            text: text.trim()
+            text: text
         };
 
         setMessages(prev => [...prev, userMsg]);
@@ -79,7 +89,8 @@ const MascotCompanion = () => {
         setIsLoading(true);
 
         try {
-            const aiReply = await askQuizzyAI(messages, text.trim());
+            const currentHistory = messagesRef.current;
+            const aiReply = await askQuizzyAI(currentHistory, text);
             const modelMsg = {
                 id: Date.now() + 1,
                 role: 'model',
@@ -99,7 +110,27 @@ const MascotCompanion = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [inputText]);
+
+    // Lắng nghe sự kiện yêu cầu Quizzy giải thích từ phòng thi (Review Mode)
+    useEffect(() => {
+        const handleAskQuizzyEvent = (e) => {
+            const prompt = e.detail?.prompt;
+            if (prompt) {
+                setShowCard(true);
+                setShowBubble(false);
+                // Đợi animation mở cửa sổ hoàn tất rồi tự động gửi prompt
+                setTimeout(() => {
+                    handleSendMessage(prompt);
+                }, 200);
+            }
+        };
+
+        window.addEventListener(QUIZZY_EVENT_ASK, handleAskQuizzyEvent);
+        return () => {
+            window.removeEventListener(QUIZZY_EVENT_ASK, handleAskQuizzyEvent);
+        };
+    }, [handleSendMessage]);
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {

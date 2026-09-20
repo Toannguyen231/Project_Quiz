@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getQuzizeByPage } from '../sevices/apiService';
+import Leaderboard from '../Common/Leaderboard';
 import './ListQuiz.scss';
 import { useNavigate } from "react-router-dom";
 
@@ -174,6 +175,11 @@ const ListQuiz = () => {
                     </button>
                 </div>
             )}
+
+            {/* Gamification: Bảng vinh danh Top học viên xuất sắc */}
+            <div style={{ marginTop: '70px' }}>
+                <Leaderboard />
+            </div>
         </div>
     );
 };

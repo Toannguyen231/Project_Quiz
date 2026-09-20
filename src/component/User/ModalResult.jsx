@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from "react-router-dom";
 import mascotImg from '../../accets/quizzy-mascot.jpg';
+import { triggerCelebrationConfetti } from '../sevices/gamificationService';
 import './ModalResult.scss';
 
 const ModalResult = (props) => {
@@ -13,6 +14,13 @@ const ModalResult = (props) => {
     const countTotal = dataModalResult?.countTotal || dataQuiz?.length || 0;
     const percentage = countTotal > 0 ? Math.round((countCorrect / countTotal) * 100) : 0;
     const isPassed = percentage >= 50;
+
+    // Gamification: Kích hoạt pháo hoa giấy ăn mừng (Confetti) khi đạt từ 80% điểm trở lên
+    useEffect(() => {
+        if (show && percentage >= 80) {
+            triggerCelebrationConfetti();
+        }
+    }, [show, percentage]);
 
     const handleClose = () => {
         setShow(false);
@@ -96,10 +104,23 @@ const ModalResult = (props) => {
                 <div className="result-actions-group">
                     <button
                         type="button"
+                        className="btn-action review-exam-btn"
+                        onClick={() => {
+                            setShow(false);
+                            if (props.onEnterReviewMode) {
+                                props.onEnterReviewMode();
+                            }
+                        }}
+                        title="Quay lại phòng thi để xem chi tiết từng câu hỏi kèm lời giải"
+                    >
+                        📖 Xem Lại Lời Giải Chi Tiết
+                    </button>
+                    <button
+                        type="button"
                         className="btn-action secondary"
                         onClick={() => setShowReview(!showReview)}
                     >
-                        {showReview ? '▲ Thu gọn đáp án' : '🔍 Xem chi tiết đáp án'}
+                        {showReview ? '▲ Thu gọn đáp án' : '🔍 Bảng đáp án nhanh'}
                     </button>
                     <button
                         type="button"

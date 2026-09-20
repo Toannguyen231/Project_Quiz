@@ -43,6 +43,11 @@
         font-size: 0.88rem;
         font-weight: 600;
         color: var(--qm-slate-600);
+
+        .flag-summary-label {
+          color: #ea580c;
+          font-weight: 700;
+        }
       }
 
       .progress-bar-track {
@@ -61,6 +66,36 @@
       }
     }
 
+    /* Review Mode Banner in Top Bar */
+    .review-mode-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      .review-badge-pill {
+        padding: 5px 14px;
+        border-radius: var(--qm-radius-full);
+        background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+        color: #ffffff;
+        font-family: var(--qm-font-heading);
+        font-weight: 800;
+        font-size: 0.85rem;
+        letter-spacing: 0.4px;
+        box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+      }
+
+      .review-score-text {
+        font-size: 0.95rem;
+        color: var(--qm-slate-700);
+
+        strong {
+          color: var(--qm-success);
+          font-weight: 800;
+        }
+      }
+    }
+
     .btn-exit-exam {
       padding: 6px 14px;
       font-size: 0.85rem;
@@ -75,6 +110,19 @@
         background-color: var(--qm-danger-light);
         color: var(--qm-danger);
         border-color: var(--qm-danger);
+      }
+
+      &.btn-reopen-modal {
+        background-color: #eff6ff;
+        color: #2563eb;
+        border-color: #bfdbfe;
+        font-weight: 700;
+
+        &:hover {
+          background-color: #dbeafe;
+          color: #1d4ed8;
+          border-color: #93c5fd;
+        }
       }
     }
   }
@@ -174,6 +222,49 @@
             cursor: not-allowed;
           }
         }
+
+        /* Review Footer Action Buttons */
+        .review-footer-actions {
+          display: flex;
+          gap: 10px;
+
+          .btn-reopen-summary {
+            padding: 10px 20px;
+            font-family: var(--qm-font-heading);
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #ffffff;
+            background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+            border: none;
+            border-radius: var(--qm-radius-md);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+            cursor: pointer;
+            transition: all var(--qm-transition-fast);
+
+            &:hover {
+              transform: translateY(-1px);
+              box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+            }
+          }
+
+          .btn-back-user-list {
+            padding: 10px 18px;
+            font-family: var(--qm-font-heading);
+            font-weight: 600;
+            font-size: 0.95rem;
+            background-color: var(--qm-slate-100);
+            color: var(--qm-slate-700);
+            border: 1px solid var(--qm-slate-200);
+            border-radius: var(--qm-radius-md);
+            cursor: pointer;
+            transition: all var(--qm-transition-fast);
+
+            &:hover {
+              background-color: var(--qm-slate-200);
+              color: var(--qm-slate-900);
+            }
+          }
+        }
       }
     }
 
@@ -218,6 +309,14 @@
             color: var(--qm-danger);
             animation: pulseTime 1s infinite;
           }
+        }
+
+        .review-status-text {
+          font-family: var(--qm-font-heading);
+          font-size: 1.4rem;
+          font-weight: 800;
+          color: var(--qm-success);
+          padding: 4px 0;
         }
       }
 
@@ -268,6 +367,7 @@
             background-color: var(--qm-slate-50);
             color: var(--qm-slate-700);
             transition: all var(--qm-transition-fast);
+            position: relative;
 
             &:hover {
               border-color: var(--qm-primary);
@@ -276,10 +376,10 @@
             }
 
             &.current {
-              border: 2px solid var(--qm-primary);
+              border: 2px solid var(--qm-primary) !important;
               color: var(--qm-primary);
               background-color: var(--qm-primary-light);
-              box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+              box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
             }
 
             &.answered {
@@ -288,8 +388,55 @@
               color: #ffffff;
 
               &.current {
-                border-color: #059669;
+                border-color: #059669 !important;
                 box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+              }
+            }
+
+            /* 1. Cắm cờ xem lại */
+            &.flagged {
+              border-color: #f97316 !important;
+              background-color: #fff7ed !important;
+              color: #c2410c !important;
+
+              &::after {
+                content: '🚩';
+                position: absolute;
+                top: -6px;
+                right: -4px;
+                font-size: 0.62rem;
+                filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+              }
+
+              &.answered {
+                background-color: #ea580c;
+                border-color: #c2410c !important;
+                color: #ffffff;
+              }
+
+              &.current {
+                box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.4) !important;
+              }
+            }
+
+            /* 3. Chế độ Review: Tô màu Đúng / Sai */
+            &.review-correct {
+              background-color: #10b981 !important;
+              border-color: #059669 !important;
+              color: #ffffff !important;
+
+              &.current {
+                box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.45) !important;
+              }
+            }
+
+            &.review-incorrect {
+              background-color: #ef4444 !important;
+              border-color: #dc2626 !important;
+              color: #ffffff !important;
+
+              &.current {
+                box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.45) !important;
               }
             }
           }
@@ -316,11 +463,31 @@
               border-radius: 2px;
 
               &.answered { background-color: #10b981; }
+              &.flagged { background-color: #f97316; }
+              &.correct { background-color: #10b981; }
+              &.incorrect { background-color: #ef4444; }
               &.current { background-color: var(--qm-primary-light); border: 1.5px solid var(--qm-primary); }
               &.unanswered { background-color: var(--qm-slate-100); border: 1px solid var(--qm-slate-300); }
             }
           }
         }
+      }
+    }
+  }
+}
+
+@keyframes pulseTime {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@media (max-width: 900px) {
+  .exam-workspace {
+    .exam-body-grid {
+      grid-template-columns: 1fr;
+
+      .exam-monitor-sidebar {
+        order: -1;
       }
     }
   }

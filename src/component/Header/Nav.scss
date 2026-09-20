@@ -72,6 +72,60 @@
     align-items: center;
   }
 
+  /* Gamification: Daily Streak Flame Badge */
+  .daily-streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    border: 1.5px solid #fed7aa;
+    border-radius: var(--qm-radius-full);
+    font-family: var(--qm-font-heading);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #c2410c;
+    box-shadow: 0 2px 8px rgba(249, 115, 22, 0.15);
+    cursor: default;
+    transition: all var(--qm-transition-fast);
+    user-select: none;
+
+    .streak-flame {
+      font-size: 1.15rem;
+      filter: drop-shadow(0 2px 4px rgba(249, 115, 22, 0.4));
+      animation: flamePulse 2s ease-in-out infinite;
+    }
+
+    .streak-count {
+      font-weight: 800;
+      color: #ea580c;
+      font-size: 0.95rem;
+    }
+
+    .streak-unit {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #9a3412;
+    }
+
+    &.active-today {
+      background: linear-gradient(135deg, #ffedd5 0%, #fcd34d 100%);
+      border-color: #f59e0b;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+      color: #92400e;
+
+      .streak-flame {
+        animation: flameActive 1.2s ease-in-out infinite alternate;
+      }
+    }
+
+    &:hover {
+      transform: translateY(-1px) scale(1.03);
+      box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
+    }
+  }
+
   .theme-toggle-btn {
     width: 38px;
     height: 38px;
@@ -88,6 +142,16 @@
       background-color: var(--qm-slate-200);
       color: var(--qm-slate-900);
     }
+  }
+
+  @keyframes flamePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15) rotate(3deg); }
+  }
+
+  @keyframes flameActive {
+    0% { transform: scale(1) rotate(-4deg); }
+    100% { transform: scale(1.25) rotate(6deg); }
   }
 
   .btn-tpp-login {

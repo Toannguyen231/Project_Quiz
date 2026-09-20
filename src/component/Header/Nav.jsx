@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -7,6 +7,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { FiSun, FiMoon } from 'react-icons/fi';
 import nntLogo from '../../accets/nnt-logo.jpg';
+import { getStreakInfo, STREAK_EVENT } from '../sevices/gamificationService';
 import './Nav.scss';
 
 const Header = () => {
@@ -16,6 +17,28 @@ const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isDarkMode, setIsDarkMode] = useState(false);
+
+    // Gamification: Hệ thống Chuỗi ngày học tập (Daily Streak 🔥)
+    const [streakInfo, setStreakInfo] = useState(() => getStreakInfo());
+
+    useEffect(() => {
+        // Cập nhật lại streak khi component mount
+        setStreakInfo(getStreakInfo());
+
+        // Lắng nghe sự kiện khi học viên hoàn thành quiz để cập nhật streak ngay lập tức
+        const handleStreakUpdate = (e) => {
+            if (e.detail?.streak) {
+                setStreakInfo({
+                    streak: e.detail.streak,
+                    lastCompletedDate: e.detail.today,
+                    isActiveToday: true
+                });
+            }
+        };
+
+        window.addEventListener(STREAK_EVENT, handleStreakUpdate);
+        return () => window.removeEventListener(STREAK_EVENT, handleStreakUpdate);
+    }, []);
 
     const handleClickSignUp = () => {
         navigate('/signup');
@@ -107,9 +130,9 @@ const Header = () => {
                         <button 
                             type="button" 
                             className="nav-link-tpp btn-nav-plain"
-                            onClick={() => alert("Tính năng Reels — Video Bài Giảng Ngắn NNT đang được phát triển!")}
+                            onClick={() => alert("Tính năng Tips Nhanh — Video & Bí Kíp Ôn Thi NNT đang được hoàn thiện và sẽ sớm ra mắt!")}
                         >
-                            Reels
+                            Tips Nhanh
                         </button>
                         <button 
                             type="button" 
@@ -129,6 +152,18 @@ const Header = () => {
                     </Nav>
 
                     <div className="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+                        {/* Daily Streak Flame Badge */}
+                        <div 
+                            className={`daily-streak-badge ${streakInfo.isActiveToday ? 'active-today' : ''}`}
+                            title={streakInfo.isActiveToday 
+                                ? `Chuỗi học tập: ${streakInfo.streak} ngày liên tiếp (Hôm nay đã hoàn thành! 🔥)` 
+                                : `Chuỗi học tập: ${streakInfo.streak} ngày liên tiếp (Làm ngay 1 bài quiz để duy trì chuỗi nhé!)`}
+                        >
+                            <span className="streak-flame">🔥</span>
+                            <span className="streak-count">{streakInfo.streak}</span>
+                            <span className="streak-unit">ngày</span>
+                        </div>
+
                         {/* Theme Toggle */}
                         <button
                             type="button"
