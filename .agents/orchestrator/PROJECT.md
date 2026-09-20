@@ -58,10 +58,10 @@
 | M2 | Wave A - Exam Engine Module | F06, F07, F08, F09, F10, F11, F12 | None (can use mock fallback until M5) | DONE |
 | M3 | Wave A - Admin Console Module | F13, F14, F15, F16, F17, F18, F19 | None (can use mock fallback until M5) | DONE |
 | M4 | Wave B - Unit Test Suite | F20, F21, F22, F23 | M1, M2, M3 | DONE |
-| M5 | Wave C - Backend API & SQLite | F24, F25, F26, F27, F28 | M1, M2, M3 contracts | IN_PROGRESS |
-| M6 | Wave D - Platform UX/UI | F29, F30, F31 | M1, M2, M3 | PLANNED |
-| M7 | Wave D - DevOps & CI/CD | F32, M33 | M4, M5 | PLANNED |
-| M8 | Final Verification & Integration | F34 | M1-M7 | PLANNED |
+| M5 | Wave C - Backend API & SQLite | F24, F25, F26, F27, F28 | M1, M2, M3 contracts | DONE |
+| M6 | Wave D - Platform UX/UI | F29, F30, F31 | M1, M2, M3 | DONE |
+| M7 | Wave D - DevOps & CI/CD | F32, M33 | M4, M5 | DONE |
+| M8 | Final Verification & Integration | F34 | M1-M7 | DONE |
 
 ## Code Layout & File Ownership Matrix
 | Module / Area | Owner | Exclusive Files / Directories |

@@ -43,7 +43,7 @@ const postLogin = async (email, password, delay) => {
     data.append('email', email);
     data.append('password', password);
     data.append('delay', delay || 5000);
-    return await instance.post('http://localhost:8081/api/v1/login', data);
+    return await instance.post('/login', data);
   } catch (error) {
     if (isNetworkError(error)) {
       return mockLogin(email, password);
@@ -58,7 +58,7 @@ const postCreateSignUp = async (userName, email, password) => {
     data.append('userName', userName);
     data.append('email', email);
     data.append('password', password);
-    return await instance.post('http://localhost:8081/api/v1/register', data);
+    return await instance.post('/register', data);
   } catch (error) {
     if (isNetworkError(error)) {
       return mockRegister(userName, email, password);
@@ -76,7 +76,7 @@ const postCreateUser = async (email, password, username, role, image) => {
     data.append('username', username);
     data.append('role', role);
     data.append('userImage', image);
-    return await instance.post('http://localhost:8081/api/v1/participant', data);
+    return await instance.post('/participant', data);
   } catch (error) {
     if (isNetworkError(error)) {
       return mockCreateUserService(email, password, username, role, image);
@@ -87,7 +87,7 @@ const postCreateUser = async (email, password, username, role, image) => {
 
 const getAllUsers = async () => {
   try {
-    return await instance.get('http://localhost:8081/api/v1/participant/all');
+    return await instance.get('/participant/all');
   } catch (error) {
     if (isNetworkError(error)) {
       return mockGetAllUsers();

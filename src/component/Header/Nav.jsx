@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { FiSun, FiMoon } from 'react-icons/fi';
 import nntLogo from '../../accets/nnt-logo.jpg';
 import { getStreakInfo, STREAK_EVENT } from '../sevices/gamificationService';
+import useDarkMode from '../../hooks/useDarkMode';
 import './Nav.scss';
 
 const Header = () => {
@@ -16,7 +17,7 @@ const Header = () => {
     const isAuthenticated = useSelector(state => state.user.isAuthenticated);
     const navigate = useNavigate();
     const location = useLocation();
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    const { isDarkMode, toggleDarkMode: toggleTheme } = useDarkMode();
 
     // Gamification: Hệ thống Chuỗi ngày học tập (Daily Streak 🔥)
     const [streakInfo, setStreakInfo] = useState(() => getStreakInfo());
@@ -53,10 +54,6 @@ const Header = () => {
             payload: {}
         });
         navigate('/');
-    };
-
-    const toggleTheme = () => {
-        setIsDarkMode(!isDarkMode);
     };
 
     const isAdmin = account?.roles === 'ADMIN';
