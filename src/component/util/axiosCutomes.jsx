@@ -5,7 +5,7 @@ import 'nprogress/nprogress.css'; // Style của NProgress
 import { store, persistor } from '../actions/store';
 // Tạo một instance Axios với cấu hình cơ bản
 const instance = axios.create({
-    baseURL: 'http://localhost:8081/', // URL cơ sở của API
+    baseURL: '/api/v1', // URL cơ sở của API đi qua proxy
     timeout: 10000, // Thời gian chờ tối đa cho yêu cầu (ms)
 });
 
