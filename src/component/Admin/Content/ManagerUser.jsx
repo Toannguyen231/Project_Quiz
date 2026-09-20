@@ -18,28 +18,31 @@ const ManagerUser = (props) => {
     const [dataUpdate, setDataUpdate] = useState({});
     const [dataDelete, setDataDelete] = useState({});
     const [totalPages, setTotalPages] = useState(0);
-    const [currentPage, setCurrentPage] = useState();
+    const [currentPage, setCurrentPage] = useState(1);
     useEffect(() => {
-        // featchListUser();
         featchListUserWithPage(1);
     }, []);
 
     const featchListUser = async () => {
-        let res = await getAllUsers();
-        console.log("check list: ", res);
-        if (res.data.EC === 0) {
-            setListUsers(res.data.DT);
+        try {
+            let res = await getAllUsers();
+            if (res && res.data && res.data.EC === 0) {
+                setListUsers(res.data.DT || []);
+            }
+        } catch (error) {
+            console.error("Lỗi tải danh sách người dùng:", error);
         }
-    }
+    };
 
     const featchListUserWithPage = async (page) => {
-        let res = await getPageUserWithPage(page, LIMIT_USER);
-
-        if (res.data.EC === 0) {
-
-            // 🔥 NẾU API của bạn trả về DT.users
-            setListUsers(res.data.DT.users);
-            setTotalPages(res.data.DT.totalPages);
+        try {
+            let res = await getPageUserWithPage(page, LIMIT_USER);
+            if (res && res.data && res.data.EC === 0) {
+                setListUsers(res.data.DT.users || []);
+                setTotalPages(res.data.DT.totalPages || 0);
+            }
+        } catch (error) {
+            console.error("Lỗi phân trang người dùng:", error);
         }
     };
 

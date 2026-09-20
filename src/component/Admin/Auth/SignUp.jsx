@@ -24,35 +24,48 @@ function SignUp() {
         //validate 
         const isValidEmail = validateEmail(email);
         if (!isValidEmail) {
-            toast.error('Invalid email address');
+            toast.error('Email không hợp lệ');
+            return;
+        }
+
+        if (!userName.trim()) {
+            toast.error('Vui lòng nhập tên người dùng');
             return;
         }
 
         if (!password) {
-            toast.error('Password cannot be empty');
+            toast.error('Mật khẩu không được để trống');
             return;
         }
-        let res = await postCreateSignUp(userName, email, password);
 
-        if (res && res.data && res.data.EC === 0) {
-            toast.success(res.data.EM);
-            navigate('/');
-        } else {
-            toast.error(res?.data?.EM || 'SignUp failed');
+        try {
+            let res = await postCreateSignUp(userName, email, password);
+
+            if (res && res.data && res.data.EC === 0) {
+                toast.success(res.data.EM || 'Đăng ký tài khoản thành công! Đang chuyển hướng...');
+                setTimeout(() => {
+                    navigate('/login');
+                }, 1000);
+            } else {
+                toast.error(res?.data?.EM || 'Đăng ký thất bại');
+            }
+        } catch (error) {
+            toast.error('Có lỗi xảy ra khi đăng ký');
         }
-        console.log("check res SignUp: ", res);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSubmitSignUp();
+        }
     };
 
     const handleGoogleSignup = () => {
-        toast.info('Google signup coming soon!');
+        toast.info('Đăng nhập với Google sắp ra mắt!');
     };
 
     const handleMicrosoftSignup = () => {
-        toast.info('Microsoft signup coming soon!');
-    };
-
-    const handleEmailSignup = () => {
-        toast.info('Email signup coming soon!');
+        toast.info('Đăng nhập với Microsoft sắp ra mắt!');
     };
 
     const handleClickLogin = () => {
@@ -74,13 +87,13 @@ function SignUp() {
             {/* Left Panel */}
             <div className="SignUp-left">
                 <div className="SignUp-left-content">
-                    <h1 className="SignUp-title">Sign up<br />and come on in</h1>
+                    <h1 className="SignUp-title">Đăng ký<br />NNT Academy</h1>
                     <div className="SignUp-illustration">
                         <img src={SignUpImg} alt="SignUp illustration" className="illustration-img" />
                     </div>
                 </div>
                 <div className="SignUp-footer">
-                    <p>© Typeform</p>
+                    <p>© NNT Academy</p>
                 </div>
             </div>
 
@@ -89,11 +102,11 @@ function SignUp() {
                 <div className="SignUp-right-header">
                     <div className="language-selector">
                         <span className="language-icon">🌐</span>
-                        <span className="language-text">English</span>
+                        <span className="language-text">Tiếng Việt</span>
                     </div>
                     <div className="SignUp-link">
-                        <span>Already have an account?</span>
-                        <button className="link-button" onClick={handleClickLogin}>Log in</button>
+                        <span>Đã có tài khoản?</span>
+                        <button className="link-button" onClick={handleClickLogin}>Đăng nhập</button>
                     </div>
                 </div>
 
@@ -103,47 +116,48 @@ function SignUp() {
                             <span className="brand-square"></span>
                             <span className="brand-circle"></span>
                         </div>
-                        <h2 className="brand-name">Typeform</h2>
+                        <h2 className="brand-name">NNT Academy</h2>
                     </div>
 
                     <div className='SignUp-right-inputs'>
                         <input
                             type="text"
-                            placeholder='User Name'
+                            placeholder='Tên người dùng'
                             className='input-userName'
                             size="30"
                             value={userName} onChange={(e) => setUserName(e.target.value)} />
                         <input
                             type="text"
-                            placeholder="Email address"
+                            placeholder="Địa chỉ Email"
                             className='input-email'
                             size="30" value={email}
                             onChange={(e) => setEmail(e.target.value)} />
                         <input
                             type="password"
-                            placeholder="Password"
+                            placeholder="Mật khẩu"
                             className='input-password'
                             value={password}
+                            onKeyDown={handleKeyDown}
                             onChange={(e) => setPassword(e.target.value)} />
                     </div>
 
                     <div className="SignUp-buttons">
                         <button className="btn-social btn-google" onClick={handleGoogleSignup}>
                             <TbBrandGoogle size={20} />
-                            <span>Sign up with Google</span>
+                            <span>Đăng ký với Google</span>
                         </button>
 
                         <button className="btn-social btn-microsoft" onClick={handleMicrosoftSignup}>
                             <TbBrandWindows size={20} />
-                            <span>Sign up with Microsoft</span>
+                            <span>Đăng ký với Microsoft</span>
                         </button>
 
                         <div className="divider">
-                            <span>OR</span>
+                            <span>HOẶC</span>
                         </div>
 
                         <button className="btn-email" onClick={handleSubmitSignUp}>
-                            Sign up with email
+                            Đăng ký với Email
                         </button>
                     </div>
                 </div>

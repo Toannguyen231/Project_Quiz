@@ -9,104 +9,118 @@ import {
     SidebarFooter,
 } from 'react-pro-sidebar';
 import 'react-pro-sidebar/dist/css/styles.css';
-import sidebarBg from '../../accets/bg2.jpg';
 import {
     FaTachometerAlt,
     FaRegLaughWink,
     FaGithub,
+    FaBookOpen,
+    FaQuestionCircle,
+    FaUsers,
+    FaGraduationCap
 } from 'react-icons/fa';
-import { GiAllSeeingEye } from "react-icons/gi";
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
-
-const SideBar = ({ image = true, collapsed, rtl, toggled, handleToggleSidebar }) => {
+const SideBar = ({ collapsed, toggled, handleToggleSidebar }) => {
     const navigate = useNavigate();
+
     return (
-        <>
-            <ProSidebar
-                image={image ? sidebarBg : false}
-                collapsed={collapsed}
-                toggled={toggled}
-                breakPoint="md"
-                onToggle={handleToggleSidebar}
-            >
-                <SidebarHeader>
-                    <div
-                        style={{
-                            padding: '24px',
-                            textTransform: 'uppercase',
-                            fontWeight: 'bold',
-                            fontSize: 14,
-                            letterSpacing: '1px',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                        }}
+        <ProSidebar
+            image={false}
+            collapsed={collapsed}
+            toggled={toggled}
+            breakPoint="md"
+            onToggle={handleToggleSidebar}
+            style={{
+                backgroundColor: '#0f172a',
+                color: '#cbd5e1'
+            }}
+        >
+            <SidebarHeader>
+                <div
+                    style={{
+                        padding: '24px 20px',
+                        fontWeight: 'bold',
+                        fontSize: 18,
+                        letterSpacing: '0.5px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        borderBottom: '1px solid #1e293b',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        cursor: 'pointer'
+                    }}
+                    onClick={() => navigate('/')}
+                >
+                    <FaGraduationCap size="1.8rem" color="#6C63FF" />
+                    <span style={{ color: '#ffffff', fontFamily: 'var(--qm-font-heading)', fontWeight: '700' }}>
+                        NNT Academy
+                    </span>
+                </div>
+            </SidebarHeader>
+
+            <SidebarContent>
+                <Menu iconShape="circle">
+                    <MenuItem
+                        icon={<FaTachometerAlt color="#3b82f6" />}
                     >
-                        <div>
-                            <GiAllSeeingEye size="3rem" style={{ marginRight: '3px' }} />
-                            <span onClick={() => navigate("/")}>
-                                Ngoc Toan
-                            </span>
-                        </div>
+                        Tổng quan
+                        <Link to="/admin" />
+                    </MenuItem>
+                </Menu>
 
-                    </div>
-                </SidebarHeader>
-
-                <SidebarContent>
-                    <Menu iconShape="circle">
-                        <MenuItem
-                            icon={<FaTachometerAlt />}
-                            suffix={<span className="badge red">New</span>}
-                        >
-                            DashBoard
-                            <Link to="/admin" />
+                <Menu iconShape="circle">
+                    <SubMenu
+                        icon={<FaRegLaughWink color="#8b5cf6" />}
+                        title="Quản trị nội dung"
+                        defaultOpen={true}
+                    >
+                        <MenuItem icon={<FaBookOpen color="#38bdf8" />}>
+                            Quản lý đề thi
+                            <Link to="/admin/manageQuiz" />
                         </MenuItem>
-                    </Menu>
-                    <Menu iconShape="circle">
-                        <SubMenu
-                            icon={<FaRegLaughWink />}
-                            title='Features'
-                        >
-                            <MenuItem>
-                                Quản lý User
-                                <Link to="/admin/manageruser" />
-                            </MenuItem>
-                            <MenuItem>
-                                Quản lý bài Quiz
-                                <Link to="/admin/manageQuiz"></Link>
-                            </MenuItem>
-                            <MenuItem>
-                                Quản lý câu hỏi
-                                <Link to="/admin/manageQuestions"></Link>
-                            </MenuItem>
-                        </SubMenu>
-                    </Menu>
-                </SidebarContent>
+                        <MenuItem icon={<FaQuestionCircle color="#34d399" />}>
+                            Ngân hàng câu hỏi
+                            <Link to="/admin/manageQuestions" />
+                        </MenuItem>
+                        <MenuItem icon={<FaUsers color="#fbbf24" />}>
+                            Quản lý thí sinh
+                            <Link to="/admin/manageruser" />
+                        </MenuItem>
+                    </SubMenu>
+                </Menu>
+            </SidebarContent>
 
-                <SidebarFooter style={{ textAlign: 'center' }}>
-                    <div
-                        className="sidebar-btn-wrapper"
+            <SidebarFooter style={{ textAlign: 'center', borderTop: '1px solid #1e293b' }}>
+                <div
+                    className="sidebar-btn-wrapper"
+                    style={{
+                        padding: '16px 20px',
+                    }}
+                >
+                    <a
+                        href="https://github.com/Toannguyen231"
+                        target="_blank"
+                        className="sidebar-btn"
+                        rel="noopener noreferrer"
                         style={{
-                            padding: '20px 24px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            color: '#94a3b8',
+                            textDecoration: 'none',
+                            fontSize: '0.88rem',
+                            fontWeight: '600'
                         }}
                     >
-                        <a
-                            href="https://github.com/Toannguyen231"
-                            target="_blank"
-                            className="sidebar-btn"
-                            rel="noopener noreferrer"
-                        >
-                            <FaGithub />
-                            <span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                                ToanNguyen231
-                            </span>
-                        </a>
-                    </div>
-                </SidebarFooter>
-            </ProSidebar>
-        </>
+                        <FaGithub size={18} />
+                        <span>ToanNguyen231</span>
+                    </a>
+                </div>
+            </SidebarFooter>
+        </ProSidebar>
     );
-}
+};
 
-export default SideBar
+export default SideBar;

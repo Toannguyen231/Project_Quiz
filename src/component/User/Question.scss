@@ -1,24 +1,151 @@
-.question {
+.question-component {
+  .question-header {
     display: flex;
-    flex-direction: column; // xuống dòng (xếp dọc)
-    align-items: center; // căn giữa theo ngang
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
 
-    /* xếp theo cột => xuống dòng */
-    /* cho phép xuống dòng */
-    .q-Image {
-        display: flex;
-        margin-bottom: 30px;
-        max-width: 300px;
-        height: auto;
-        height: 200px;
-
-        .question-img {
-            /* hoặc theo khung bạn muốn */
-            object-fit: cover;
-        }
+    .question-number-badge {
+      flex-shrink: 0;
+      padding: 4px 12px;
+      background-color: var(--qm-primary-light);
+      color: var(--qm-primary);
+      border: 1px solid var(--qm-primary-border);
+      border-radius: var(--qm-radius-full);
+      font-family: var(--qm-font-heading);
+      font-weight: 700;
+      font-size: 0.85rem;
     }
-}
 
-.answer {
-    padding-left: 60px;
+    .question-title-text {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--qm-slate-900);
+      line-height: 1.45;
+      margin: 0;
+    }
+  }
+
+  /* Question Image */
+  .question-image-box {
+    margin-bottom: 24px;
+    border-radius: var(--qm-radius-md);
+    overflow: hidden;
+    border: 1px solid var(--qm-slate-200);
+    max-width: 480px;
+    position: relative;
+    cursor: pointer;
+
+    .q-img {
+      width: 100%;
+      max-height: 260px;
+      object-fit: cover;
+      display: block;
+      transition: transform var(--qm-transition-normal);
+
+      &:hover {
+        transform: scale(1.02);
+      }
+    }
+
+    .zoom-hint {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background-color: rgba(15, 23, 42, 0.75);
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: var(--qm-radius-sm);
+      font-size: 0.75rem;
+      font-weight: 600;
+      backdrop-filter: blur(4px);
+    }
+  }
+
+  /* Option Cards List */
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .option-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      background-color: #ffffff;
+      border: 1.5px solid var(--qm-slate-200);
+      border-radius: var(--qm-radius-md);
+      cursor: pointer;
+      user-select: none;
+      transition: all var(--qm-transition-fast);
+
+      &:hover {
+        border-color: var(--qm-primary-border);
+        background-color: #f8fafc;
+        transform: translateX(3px);
+      }
+
+      &.selected {
+        border-color: var(--qm-primary);
+        background-color: var(--qm-primary-light);
+        box-shadow: 0 0 0 1px var(--qm-primary);
+
+        .option-letter {
+          background-color: var(--qm-primary);
+          color: #ffffff;
+          border-color: var(--qm-primary);
+        }
+
+        .option-text {
+          color: var(--qm-primary-hover);
+          font-weight: 600;
+        }
+
+        .check-indicator {
+          border-color: var(--qm-primary);
+          background-color: var(--qm-primary);
+          color: #ffffff;
+        }
+      }
+
+      .option-letter {
+        width: 34px;
+        height: 34px;
+        border-radius: var(--qm-radius-full);
+        border: 1.5px solid var(--qm-slate-300);
+        background-color: var(--qm-slate-50);
+        color: var(--qm-slate-700);
+        font-family: var(--qm-font-heading);
+        font-weight: 700;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: all var(--qm-transition-fast);
+      }
+
+      .option-text {
+        flex: 1;
+        font-size: 0.98rem;
+        color: var(--qm-slate-700);
+        line-height: 1.4;
+        transition: color var(--qm-transition-fast);
+      }
+
+      .check-indicator {
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        border: 1.5px solid var(--qm-slate-300);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+        transition: all var(--qm-transition-fast);
+      }
+    }
+  }
 }

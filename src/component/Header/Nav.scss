@@ -1,0 +1,183 @@
+.navbar-tpp {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 10px 0;
+  border-bottom: 1px solid var(--qm-slate-200);
+
+  .navbar-brand-tpp {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+
+    .brand-logo-img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: var(--qm-radius-md);
+    }
+
+    .brand-text-wrap {
+      display: flex;
+      flex-direction: column;
+
+      .brand-title {
+        font-family: var(--qm-font-heading);
+        font-size: 1.35rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #6C63FF 0%, #FF9963 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1.1;
+      }
+
+      .brand-slogan {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #f59e0b;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+      }
+    }
+  }
+
+  .nav-link-tpp {
+    font-family: var(--qm-font-heading);
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: var(--qm-slate-700) !important;
+    padding: 8px 14px !important;
+    border-radius: var(--qm-radius-md);
+    transition: all var(--qm-transition-fast);
+    text-decoration: none;
+
+    &:hover {
+      color: #6C63FF !important;
+      background-color: #f5f3ff;
+    }
+
+    &.active {
+      color: #6C63FF !important;
+      background-color: #f5f3ff;
+      font-weight: 700;
+    }
+  }
+
+  .btn-nav-plain {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .theme-toggle-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--qm-radius-md);
+    border: 1px solid var(--qm-slate-200);
+    background-color: var(--qm-slate-50);
+    color: var(--qm-slate-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--qm-transition-fast);
+
+    &:hover {
+      background-color: var(--qm-slate-200);
+      color: var(--qm-slate-900);
+    }
+  }
+
+  .btn-tpp-login {
+    padding: 8px 20px;
+    font-family: var(--qm-font-heading);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--qm-slate-800);
+    background-color: transparent;
+    border: 1.5px solid var(--qm-slate-300);
+    border-radius: var(--qm-radius-full);
+    transition: all var(--qm-transition-fast);
+
+    &:hover {
+      background-color: var(--qm-slate-100);
+      border-color: #6C63FF;
+      color: #6C63FF;
+    }
+  }
+
+  .btn-tpp-register {
+    padding: 8px 22px;
+    font-family: var(--qm-font-heading);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #ffffff;
+    background: linear-gradient(135deg, #6C63FF 0%, #FF9963 100%);
+    border: none;
+    border-radius: var(--qm-radius-full);
+    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+    transition: all var(--qm-transition-fast);
+
+    &:hover {
+      box-shadow: 0 6px 16px rgba(108, 99, 255, 0.45);
+      transform: translateY(-1px);
+      color: #ffffff;
+    }
+  }
+
+  #basic-nav-dropdown {
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+
+    &.dropdown-toggle::after {
+      display: none !important;
+    }
+  }
+
+  .user-badge-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background-color: var(--qm-slate-100);
+    border: 1px solid var(--qm-slate-200);
+    border-radius: var(--qm-radius-full);
+    font-family: var(--qm-font-heading);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--qm-slate-800);
+    cursor: pointer;
+    transition: all var(--qm-transition-fast);
+
+    &:hover {
+      background-color: var(--qm-slate-200);
+    }
+
+    .role-pill {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: var(--qm-radius-full);
+      font-weight: 700;
+
+      &.admin {
+        background-color: #dbeafe;
+        color: #1e40af;
+      }
+
+      &.user {
+        background-color: #dcfce7;
+        color: #15803d;
+      }
+    }
+
+    .dropdown-caret-arrow {
+      font-size: 0.65rem;
+      color: var(--qm-slate-500);
+      margin-left: 2px;
+      line-height: 1;
+    }
+  }
+}

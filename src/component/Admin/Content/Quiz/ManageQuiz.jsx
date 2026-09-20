@@ -7,6 +7,7 @@ import { getAllQuizForAdmin, postCreateQuiz } from '../../../sevices/apiService'
 import ModalUpdateQuiz from './ModalUpdateQuiz';
 import ModalViewQuiz from './ModalViewQuiz';
 import ModalDelete from './ModalDelete';
+import { toast } from 'react-toastify';
 const ManageQuiz = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
@@ -35,18 +36,25 @@ const ManageQuiz = () => {
     }, []);
 
     const fetchListQuiz = async () => {
-        let res = await getAllQuizForAdmin();
-        if (res && res.data.EC === 0) {
-            setListQuiz(res.data.DT);
+        try {
+            let res = await getAllQuizForAdmin();
+            if (res && res.data && res.data.EC === 0) {
+                setListQuiz(res.data.DT);
+            }
+        } catch (error) {
+            console.warn('Lỗi tải danh sách quiz:', error);
         }
     }
 
     const handleSubmitQuiz = async () => {
+        if (!name) {
+            toast.warning('Vui lòng nhập tên bài thi');
+            return;
+        }
         try {
             let res = await postCreateQuiz(name, description, type, image);
-            console.log('>>> check res create quiz: ', res);
-            if (res && res.data.EC === 0) {
-                // success, maybe reset form or show message
+            if (res && res.data && res.data.EC === 0) {
+                toast.success(res.data.EM || 'Tạo bài thi thành công!');
                 setName('');
                 setDescription('');
                 setType('EASY');
@@ -54,10 +62,12 @@ const ManageQuiz = () => {
                 if (fileInputRef.current) {
                     fileInputRef.current.value = '';
                 }
-                fetchListQuiz(); // refresh list
+                fetchListQuiz();
+            } else {
+                toast.error(res?.data?.EM || 'Tạo bài thi thất bại');
             }
         } catch (error) {
-            console.error('Error creating quiz:', error);
+            toast.error('Lỗi tạo bài thi');
         }
     }
 

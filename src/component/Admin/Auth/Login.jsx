@@ -1,5 +1,5 @@
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect, useRef } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "./Login.scss";
@@ -8,7 +8,6 @@ import { postLogin } from '../../sevices/apiService';
 import { TbBrandWindows } from "react-icons/tb";
 import { useDispatch, useSelector } from 'react-redux';
 import { ImSpinner6 } from "react-icons/im";
-// import { delay } from 'lodash'; // không dùng thì bỏ
 import { FETCH_USER_LOGIN_SUCCESS } from '../../actions/Actions';
 
 function Login() {
@@ -26,51 +25,45 @@ function Login() {
         };
     }, []);
 
-    // 🔍 DEBUG: xem token trong Redux
-    const accessToken = useSelector(state => state?.user?.account?.access_token);
-    useEffect(() => {
-        console.log("Redux access_token = ", accessToken);
-    }, [accessToken]);
-
     const validateEmail = (email) => {
         return String(email)
             .toLowerCase()
             .match(
-                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                /^(([^<>()[\]\\.,;:\s@"]+(.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
             );
     };
 
-    const handleSubmitLogin = async () => {
-        // Validate
-        const isValidEmail = validateEmail(email);
+    const handleSubmitLogin = async (overrideEmail, overridePassword) => {
+        const loginEmail = overrideEmail || email;
+        const loginPassword = overridePassword || password;
+
+        const isValidEmail = validateEmail(loginEmail);
         if (!isValidEmail) {
-            toast.error('Invalid email address');
+            toast.error('Email không hợp lệ');
             return;
         }
 
-        if (!password) {
-            toast.error('Password cannot be empty');
+        if (!loginPassword) {
+            toast.error('Mật khẩu không được để trống');
             return;
         }
 
         try {
             setIsLoading(true);
 
-            let res = await postLogin(email, password);
+            let res = await postLogin(loginEmail, loginPassword);
 
             if (res && res.data && res.data.EC === 0) {
-
-                // 👉 payload = res.data.DT (bên trong có access_token, refresh_token,...)
                 dispatch({
                     type: FETCH_USER_LOGIN_SUCCESS,
                     payload: res.data
                 });
 
-                toast.success("Login successful");
+                toast.success("Đăng nhập thành công!");
                 navigate('/');
             } else {
                 if (mountedRef.current) {
-                    toast.error(res?.data?.EM || "Login failed");
+                    toast.error(res?.data?.EM || "Đăng nhập thất bại");
                 }
             }
 
@@ -78,34 +71,31 @@ function Login() {
                 setIsLoading(false);
             }
         } catch (err) {
-            console.log("Login error: ", err);
             if (mountedRef.current) {
                 setIsLoading(false);
-
                 const msg =
                     err?.response?.data?.EM ||
                     err?.response?.data?.message ||
-                    "Login failed. Please check your email or password.";
-
+                    "Đăng nhập thất bại. Vui lòng kiểm tra lại.";
                 toast.error(msg);
             }
         }
     };
 
-    const handleGoogleLogin = () => {
-        toast.info('Google login coming soon!');
-    };
-
-    const handleMicrosoftLogin = () => {
-        toast.info('Microsoft login coming soon!');
+    const handleDemoLogin = (role) => {
+        if (role === 'admin') {
+            setEmail('admin@gmail.com');
+            setPassword('admin123');
+            handleSubmitLogin('admin@gmail.com', 'admin123');
+        } else {
+            setEmail('user@gmail.com');
+            setPassword('user123');
+            handleSubmitLogin('user@gmail.com', 'user123');
+        }
     };
 
     const handleNavigateSignUp = () => {
         navigate('/signup');
-    };
-
-    const handleSSOLogin = () => {
-        toast.info('SSO login coming soon!');
     };
 
     return (
@@ -128,64 +118,87 @@ function Login() {
                                 <span className="brand-square"></span>
                                 <span className="brand-circle"></span>
                             </div>
-                            <h2 className="brand-name">Typeform</h2>
+                            <h2 className="brand-name">NNT Academy</h2>
                         </div>
                     </div>
 
                     <div className="login-form">
-                        <h1 className="login-title">Log in or Sign up</h1>
+                        <h1 className="login-title">Đăng nhập</h1>
                         <p className="login-subtitle">
-                            Get better data with conversational forms, surveys,<br />
-                            quizzes & more.
+                            Hệ thống thi trắc nghiệm trực tuyến —<br />
+                            Đánh giá kiến thức nhanh chóng & chính xác.
                         </p>
 
                         <div className="login-buttons">
-                            <button className="btn-social btn-google" onClick={handleGoogleLogin}>
-                                <FcGoogle size={20} />
-                                <span>Continue with Google</span>
-                            </button>
+                            {/* Demo Login Buttons */}
+                            <div style={{
+                                display: 'flex', gap: '10px', marginBottom: '16px'
+                            }}>
+                                <button
+                                    style={{
+                                        flex: 1, padding: '12px', borderRadius: '10px', border: '2px solid #22c55e',
+                                        backgroundColor: '#f0fdf4', color: '#15803d', fontWeight: '600', cursor: 'pointer',
+                                        transition: 'all 0.2s', fontSize: '0.9rem'
+                                    }}
+                                    onClick={() => handleDemoLogin('user')}
+                                    disabled={isLoading}
+                                    onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#dcfce7'; }}
+                                    onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#f0fdf4'; }}
+                                >
+                                    🟢 Demo Thí sinh
+                                </button>
+                                <button
+                                    style={{
+                                        flex: 1, padding: '12px', borderRadius: '10px', border: '2px solid #8b5cf6',
+                                        backgroundColor: '#f5f3ff', color: '#6d28d9', fontWeight: '600', cursor: 'pointer',
+                                        transition: 'all 0.2s', fontSize: '0.9rem'
+                                    }}
+                                    onClick={() => handleDemoLogin('admin')}
+                                    disabled={isLoading}
+                                    onMouseOver={(e) => { e.currentTarget.style.backgroundColor = '#ede9fe'; }}
+                                    onMouseOut={(e) => { e.currentTarget.style.backgroundColor = '#f5f3ff'; }}
+                                >
+                                    🟣 Demo Admin
+                                </button>
+                            </div>
 
-                            <button className="btn-social btn-microsoft" onClick={handleMicrosoftLogin}>
-                                <TbBrandWindows size={20} />
-                                <span>Continue with Microsoft</span>
-                            </button>
+                            <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem', margin: '8px 0' }}>
+                                — hoặc đăng nhập bằng email —
+                            </div>
 
                             <div className="login-input-group">
                                 <input
                                     type="email"
-                                    placeholder="Email address"
+                                    placeholder="Email"
                                     className="input-email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
                                 <input
                                     type="password"
-                                    placeholder="Password"
+                                    placeholder="Mật khẩu"
                                     className="input-password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
+                                    onKeyDown={(e) => { if (e.key === 'Enter') handleSubmitLogin(); }}
                                 />
                             </div>
 
-                            <button className="btn-email" onClick={handleSubmitLogin} disabled={isLoading}>
+                            <button className="btn-email" onClick={() => handleSubmitLogin()} disabled={isLoading}>
                                 {isLoading ? <ImSpinner6 className="loaderIcon" /> : null}
-                                <span>Continue with emails</span>
-                            </button>
-
-                            <button className="btn-sso" onClick={handleSSOLogin}>
-                                Log in with SSO
+                                <span>Đăng nhập</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <div className="login-footer">
-                    <p>Don't have an account? <button className="link-button" onClick={handleNavigateSignUp}>Sign up</button></p>
+                    <p>Chưa có tài khoản? <button className="link-button" onClick={handleNavigateSignUp}>Đăng ký</button></p>
                 </div>
             </div>
 
             <div className="login-right">
-                {/* phần trang trí giữ nguyên như của bạn */}
+                {/* phần trang trí giữ nguyên */}
             </div>
         </div>
     );

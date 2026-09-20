@@ -1,5 +1,5 @@
 /* ==========================================================================
-   NNT Academy Design Tokens — Modern EdTech & TPP Academy Visual Style
+   QuizMaster Design Tokens — Swiss / Modern EdTech Design System
    ========================================================================== */
 
 :root {
@@ -24,12 +24,6 @@
   --qm-danger: #ef4444;
   --qm-danger-hover: #dc2626;
   --qm-danger-light: #fef2f2;
-
-  /* TPP-Style Vibrant Gradients */
-  --nnt-gradient-primary: linear-gradient(135deg, #6C63FF 0%, #FF9963 100%);
-  --nnt-gradient-gold: linear-gradient(135deg, #FFBB35 0%, #FFB380 100%);
-  --nnt-gradient-button: linear-gradient(135deg, #6C63FF 0%, #FF9963 100%);
-  --nnt-gold-border: #FFDD63;
 
   /* Neutrals */
   --qm-slate-900: #0f172a;
@@ -66,76 +60,4 @@
   --qm-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --qm-transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
   --qm-transition-smooth: 350ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: var(--qm-font-body);
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--qm-slate-800);
-  background-color: var(--qm-slate-50);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--qm-font-heading);
-  color: var(--qm-slate-900);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-top: 0;
-}
-
-code {
-  font-family: 'Fira Code', source-code-pro, Menlo, Monaco, Consolas, monospace;
-}
-
-/* TPP Gradient Text Utility Classes */
-.text-gradient-purple-orange {
-  background: linear-gradient(135deg, #6C63FF 0%, #FF9963 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.text-gradient-gold {
-  background: linear-gradient(135deg, #FFBB35 0%, #FFB380 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Custom modern scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--qm-slate-100);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--qm-slate-300);
-  border-radius: var(--qm-radius-full);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--qm-slate-400);
-}
-
-/* Interactive elements default cursor */
-button,
-a,
-input[type="button"],
-input[type="submit"],
-.btn {
-  cursor: pointer;
 }

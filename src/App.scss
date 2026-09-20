@@ -1,156 +1,29 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+.app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
+  background-color: var(--qm-slate-50);
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.content-container {
-  .homepage-container {
-    position: relative;
-    width: 50%;
-    padding: 100px;
-    font-family: 'Montserrat', sans-serif;
-
-    video {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-    }
-
-    .content-homepage {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-
-      .tittle {
-        font-size: 50px;
-      }
-
-      .pharagrap {
-        font-size: 20px;
-      }
-
-      .btn-getstarted {
-        width: 160px;
-        height: 55px;
-        position: relative;
-        color: white;
-        background-color: #282c34;
-        z-index: 1;
-        border-radius: 5px;
-
-        &:hover {
-          background-color: black;
-        }
-      }
-    }
-  }
-}
-
-.app-container {
   .header-container {
-    button {
-      padding: 0 15px;
-      border-radius: 5px;
-      border: 1px solid red;
-    }
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background-color: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid var(--qm-slate-200);
+    transition: all var(--qm-transition-normal);
+  }
 
-    button.btn-login {
-      margin-right: 15px;
-    }
+  .main-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
 
-    button.btn-signup {
-      color: white;
-      background-color: #282c34;
-
-      &:hover {
-        background-color: black;
-      }
-    }
-
-    .navbar {
-      position: relative;
-      z-index: 1000;
-      background-color: rgba(0, 0, 0, 0) !important;
-
-      .nav-link {
-        &.active {
-          color: red;
-        }
-      }
-
-      // .navbar-nav .nav-link {
-      // // .navbar-nav .nav-link.active {
-      // //   color: red
-      // // }
-    }
-
-    // Media query để đẩy navbar ra gần rìa màn hình
-    // Override cả max-width và padding của container trong navbar
-    @media (min-width: 992px) {
-      .navbar .container {
-        max-width: 100% !important; // Bỏ giới hạn max-width
-        padding-left: 20px !important;
-        padding-right: 20px !important;
-        // Test: uncomment để kiểm tra
-        // background-color: rgba(255, 0, 0, 0.1) !important;
-      }
-    }
-
-    @media (min-width: 1200px) {
-      .navbar .container {
-        max-width: 100% !important;
-        padding-left: 40px !important;
-        padding-right: 40px !important;
-      }
-    }
-
-    @media (min-width: 1400px) {
-      .navbar .container {
-        max-width: 100% !important;
-        padding-left: 60px !important;
-        padding-right: 60px !important;
-      }
+    .content-container {
+      flex: 1;
+      width: 100%;
     }
   }
 }
