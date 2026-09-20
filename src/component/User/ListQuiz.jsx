@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { getQuzizeByPage } from '../sevices/apiService';
 import Leaderboard from '../Common/Leaderboard';
 import './ListQuiz.scss';
-import { useNavigate } from "react-router-dom";
 
 const EMOJIS = ['⚡', '⚛️', '🚀', '🎯', '💡', '🔥', '🌟', '📚'];
 const GRADIENTS = [
@@ -16,27 +17,40 @@ const GRADIENTS = [
 
 const ListQuiz = () => {
     const [arrayQuiz, setArrayQuiz] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [hasError, setHasError] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterDifficulty, setFilterDifficulty] = useState('ALL');
     const navigate = useNavigate();
 
-    useEffect(() => {
-        getQuizData();
-    }, []);
-
-    const getQuizData = async () => {
+    const getQuizData = useCallback(async () => {
+        setIsLoading(true);
+        setHasError(false);
         try {
-            let res = await getQuzizeByPage();
-            if (res && res.data && res.data.EC === 0 && res.data.DT && res.data.DT.length > 0) {
+            const res = await getQuzizeByPage();
+            if (res && res.data && res.data.EC === 0 && Array.isArray(res.data.DT)) {
                 setArrayQuiz(res.data.DT);
+            } else if (res && res.data && Array.isArray(res.data.DT)) {
+                setArrayQuiz(res.data.DT);
+            } else {
+                setArrayQuiz([]);
             }
         } catch (error) {
-            console.warn("Lỗi tải danh sách bài thi:", error);
+            console.error("Lỗi tải danh sách bài thi:", error);
+            setHasError(true);
+            toast.error("Không thể tải danh sách bài thi. Vui lòng kiểm tra kết nối mạng!");
+        } finally {
+            setIsLoading(false);
         }
-    };
+    }, []);
 
-    const filteredQuiz = arrayQuiz.filter(quiz => {
-        const matchSearch = (quiz.name || quiz.description || '').toLowerCase().includes(searchTerm.toLowerCase());
+    useEffect(() => {
+        getQuizData();
+    }, [getQuizData]);
+
+    const filteredQuiz = arrayQuiz.filter((quiz) => {
+        const title = (quiz.name || quiz.description || '').toLowerCase();
+        const matchSearch = title.includes(searchTerm.toLowerCase());
         const matchDifficulty = filterDifficulty === 'ALL' || quiz.difficulty === filterDifficulty;
         return matchSearch && matchDifficulty;
     });
@@ -46,7 +60,7 @@ const ListQuiz = () => {
             {/* Page Header */}
             <div className="quiz-page-header">
                 <span className="header-badge">Thư Viện Đề Thi Trực Tuyến</span>
-                <h1 className="header-title">Danh Sách Bài Thi & Thử Thách</h1>
+                <h1 className="header-title">Danh Sách Bài Thi &amp; Thử Thách</h1>
                 <p className="header-subtitle">
                     Lựa chọn bài thi phù hợp với mục tiêu học tập, rèn luyện tư duy và kiểm tra năng lực của bạn ngay hôm nay.
                 </p>
@@ -97,8 +111,53 @@ const ListQuiz = () => {
                 </div>
             </div>
 
-            {/* Quiz Cards Grid */}
-            {filteredQuiz && filteredQuiz.length > 0 ? (
+            {/* Error Banner with Retry */}
+            {hasError && !isLoading && (
+                <div style={{
+                    backgroundColor: '#fef2f2',
+                    border: '1.5px solid #fecaca',
+                    borderRadius: '12px',
+                    padding: '24px',
+                    textAlign: 'center',
+                    marginBottom: '32px'
+                }}>
+                    <div style={{ fontSize: '2rem', marginBottom: '8px' }}>📡</div>
+                    <h4 style={{ color: '#991b1b', fontWeight: 700, marginBottom: '6px' }}>
+                        Không thể kết nối đến máy chủ bài thi
+                    </h4>
+                    <p style={{ color: '#7f1d1d', fontSize: '0.95rem', marginBottom: '16px' }}>
+                        Đã xảy ra sự cố khi tải dữ liệu bài thi. Bạn vui lòng thử tải lại trang hoặc kiểm tra kết nối mạng.
+                    </p>
+                    <button
+                        type="button"
+                        className="btn btn-danger px-4 py-2 fw-bold"
+                        onClick={getQuizData}
+                    >
+                        🔄 Thử Tải Lại
+                    </button>
+                </div>
+            )}
+
+            {/* Skeleton Loading State */}
+            {isLoading && (
+                <div className="quiz-cards-grid">
+                    {[1, 2, 3, 4, 5, 6].map((sk) => (
+                        <div key={sk} className="quiz-skeleton-card">
+                            <div className="skeleton-banner" />
+                            <div className="skeleton-content">
+                                <div className="skeleton-line meta" />
+                                <div className="skeleton-line title" />
+                                <div className="skeleton-line desc" />
+                                <div className="skeleton-line desc-short" />
+                                <div className="skeleton-line btn" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Loaded Quiz Cards Grid */}
+            {!isLoading && !hasError && filteredQuiz.length > 0 && (
                 <div className="quiz-cards-grid">
                     {filteredQuiz.map((quiz, index) => (
                         <div key={quiz.id || index} className="quiz-card">
@@ -124,10 +183,10 @@ const ListQuiz = () => {
                                 <div>
                                     <div className="quiz-meta-tags">
                                         <span className="meta-tag">
-                                            📝 {quiz.questionCount || 0} câu hỏi
+                                            📝 {quiz.questionCount ?? 10} câu hỏi
                                         </span>
                                         <span className="meta-tag">
-                                            ⏱ {quiz.duration || 10} phút
+                                            ⏱ {quiz.duration ?? 15} phút
                                         </span>
                                     </div>
                                     <h3 className="quiz-title">
@@ -145,7 +204,7 @@ const ListQuiz = () => {
                                         navigate(`/quiz/${quiz.id}`, {
                                             state: {
                                                 quizTittle: quiz.name || quiz.description,
-                                                duration: quiz.duration || 10
+                                                duration: quiz.duration || 15
                                             }
                                         });
                                     }}
@@ -156,7 +215,10 @@ const ListQuiz = () => {
                         </div>
                     ))}
                 </div>
-            ) : (
+            )}
+
+            {/* Empty State */}
+            {!isLoading && !hasError && filteredQuiz.length === 0 && (
                 <div className="quiz-empty-state">
                     <div className="empty-icon">🔎</div>
                     <div className="empty-title">Không tìm thấy bài thi phù hợp</div>
@@ -176,7 +238,7 @@ const ListQuiz = () => {
                 </div>
             )}
 
-            {/* Gamification: Bảng vinh danh Top học viên xuất sắc */}
+            {/* Gamification: Leaderboard */}
             <div style={{ marginTop: '70px' }}>
                 <Leaderboard />
             </div>

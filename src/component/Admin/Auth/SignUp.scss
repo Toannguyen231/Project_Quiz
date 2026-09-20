@@ -279,14 +279,35 @@
                     cursor: pointer;
                     transition: all 0.2s;
 
-                    &:hover {
+                    .loaderIcon {
+                        animation: spin 1s linear infinite;
+                        margin-right: 5px;
+                    }
+
+                    @keyframes spin {
+                        0% {
+                            transform: rotate(0deg);
+                        }
+                        100% {
+                            transform: rotate(360deg);
+                        }
+                    }
+
+                    &:disabled {
+                        background-color: #dddddd !important;
+                        color: #afafaf !important;
+                        cursor: not-allowed;
+                    }
+
+                    &:hover:not(:disabled) {
                         background-color: #000;
                     }
 
-                    &:active {
+                    &:active:not(:disabled) {
                         transform: scale(0.98);
                     }
                 }
+
             }
         }
     }

@@ -8,15 +8,41 @@
       justify-content: space-between;
       margin-bottom: 14px;
 
-      .question-number-badge {
-        padding: 4px 14px;
-        background-color: var(--qm-primary-light);
-        color: var(--qm-primary);
-        border: 1px solid var(--qm-primary-border);
-        border-radius: var(--qm-radius-full);
-        font-family: var(--qm-font-heading);
-        font-weight: 700;
-        font-size: 0.88rem;
+      .question-badges-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .question-number-badge {
+          padding: 4px 14px;
+          background-color: var(--qm-primary-light, #eff6ff);
+          color: var(--qm-primary, #2563eb);
+          border: 1px solid var(--qm-primary-border, #bfdbfe);
+          border-radius: var(--qm-radius-full, 9999px);
+          font-family: var(--qm-font-heading, inherit);
+          font-weight: 700;
+          font-size: 0.88rem;
+        }
+
+        .question-type-badge {
+          padding: 4px 10px;
+          border-radius: var(--qm-radius-full, 9999px);
+          font-size: 0.78rem;
+          font-weight: 600;
+
+          &.single {
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+          }
+
+          &.multiple {
+            background-color: #fdf4ff;
+            color: #c026d3;
+            border: 1px solid #f5d0fe;
+          }
+        }
       }
 
       /* Nút cắm cờ / xem lại */
@@ -272,6 +298,14 @@
         font-size: 0.75rem;
         flex-shrink: 0;
         transition: all var(--qm-transition-fast);
+
+        &.circle {
+          border-radius: 50%;
+        }
+
+        &.box {
+          border-radius: 4px;
+        }
       }
     }
   }

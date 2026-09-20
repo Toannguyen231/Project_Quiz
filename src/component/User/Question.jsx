@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import _ from "lodash";
 import Lightbox from "react-awesome-lightbox";
+import { toast } from "react-toastify";
 import { triggerQuizzyChat } from "../sevices/quizzyAiService";
 import "./Question.scss";
 
@@ -20,24 +21,29 @@ const Question = (props) => {
 
     const answers = data.answers || [];
 
+    // Determine if question is multiple-choice
+    const systemCorrectCount = answers.filter(a => a.isCorrect || a.correct_answer || a.iscorrect).length;
+    const isMultipleChoice = data.type === 'MULTIPLE' || systemCorrectCount > 1;
+
     const handleSelectAnswer = (answerId) => {
-        // Trong chế độ Review (Read-only), không cho phép thay đổi đáp án
+        // In Review Mode (Read-only), candidate cannot modify choices
         if (isReviewMode) return;
         handleCheckBox(answerId, data.questionId);
     };
 
-    // Tìm danh sách đáp án đúng để hiển thị trong phần lời giải
+    // Find system correct answers for review display
     const correctAnswers = answers.filter(a => 
         a.isCorrect || 
         a.correct_answer || 
-        (questionResult?.systemAnswers?.some(s => s.id === a.id || s === a.id))
+        a.iscorrect ||
+        (questionResult?.systemAnswers?.some(s => (s.id ?? s) === a.id))
     );
     const correctLetters = correctAnswers.map(ca => {
         const idx = answers.findIndex(a => a.id === ca.id);
         return idx > -1 ? String.fromCharCode(65 + idx) : '';
     }).filter(Boolean).join(', ');
 
-    // Xác định xem câu hỏi này có bị làm sai trong chế độ Review hay không
+    // Determine candidate choices
     const userChosenAnswers = answers.filter(a => 
         a.isSelected || 
         (questionResult?.userAnswers?.includes(a.id))
@@ -53,7 +59,22 @@ const Question = (props) => {
             )
     );
 
-    // Kích hoạt Gia sư ảo Quizzy giải thích câu hỏi làm sai
+    // Anti-cheat: prevent copying question contents during active exam
+    const handleCopyPrevent = (e) => {
+        if (!isReviewMode) {
+            e.preventDefault();
+            toast.warning("⚠️ Cảnh báo: Không được phép sao chép nội dung câu hỏi trong phòng thi!");
+        }
+    };
+
+    // Anti-cheat: prevent right-click context menu during active exam
+    const handleContextMenu = (e) => {
+        if (!isReviewMode) {
+            e.preventDefault();
+        }
+    };
+
+    // Trigger AI Tutor Quizzy for questions answered incorrectly
     const handleAskQuizzy = () => {
         const questionText = data.questionDescription || `Câu hỏi số ${index + 1}`;
 
@@ -71,28 +92,35 @@ const Question = (props) => {
             }).join('; ')
             : 'Chưa chọn đáp án nào';
 
-        // Prompt ngữ cảnh truyền vào Quizzy AI theo đúng yêu cầu
         const prompt = `Đề bài: ${questionText}. Đáp án đúng là: ${correctText}. Mình đã chọn nhầm là: ${userText}. Hãy giải thích ngắn gọn bằng giọng điệu vui vẻ, dễ thương của Quizzy giúp mình hiểu bản chất và mẹo để lần sau không sai nữa nhé!`;
-
-        // Kích hoạt mở khung chat MascotCompanion và tự động gửi prompt
         triggerQuizzyChat(prompt);
     };
 
     return (
-        <div className={`question-component ${isReviewMode ? 'review-mode-active' : ''}`}>
-            {/* Question Header with Flag Toggle */}
+        <div 
+            className={`question-component ${isReviewMode ? 'review-mode-active' : ''}`}
+            onCopy={handleCopyPrevent}
+            onContextMenu={handleContextMenu}
+        >
+            {/* Question Header with Flag Toggle and Question Type Badge */}
             <div className="question-header">
                 <div className="question-header-top">
-                    <span className="question-number-badge">
-                        Câu {index + 1}
-                    </span>
+                    <div className="question-badges-group">
+                        <span className="question-number-badge">
+                            Câu {index + 1}
+                        </span>
+                        <span className={`question-type-badge ${isMultipleChoice ? 'multiple' : 'single'}`}>
+                            {isMultipleChoice ? '☑ Chọn nhiều đáp án' : '◉ Chọn 1 đáp án'}
+                        </span>
+                    </div>
 
-                    {/* Nút Cắm cờ / Xem lại */}
+                    {/* Flag for review toggle button */}
                     <button
                         type="button"
                         className={`btn-flag-toggle ${isFlagged ? 'flagged' : ''}`}
                         onClick={() => onToggleFlag && onToggleFlag(data.questionId)}
                         title={isFlagged ? "Bỏ cắm cờ câu hỏi này" : "Cắm cờ để xem lại trước khi nộp bài"}
+                        aria-pressed={isFlagged}
                     >
                         <span className="flag-icon">{isFlagged ? '🚩' : '🏳️'}</span>
                         <span className="flag-text">{isFlagged ? 'Đã cắm cờ' : 'Cắm cờ xem lại'}</span>
@@ -121,13 +149,22 @@ const Question = (props) => {
             )}
 
             {/* Interactive / Review Option Cards */}
-            <div className="options-list">
+            <div 
+                className="options-list"
+                role={isMultipleChoice ? "group" : "radiogroup"}
+                aria-label={`Danh sách phương án cho câu ${index + 1}`}
+            >
                 {answers.map((a, idx) => {
                     const letter = String.fromCharCode(65 + idx);
                     const isSelected = !!a.isSelected;
 
-                    // Logic tô màu trong chế độ Review
-                    const isSystemCorrect = !!(a.isCorrect || a.correct_answer || (questionResult?.systemAnswers?.some(s => s.id === a.id || s === a.id)));
+                    // Logic for coloring in Review Mode
+                    const isSystemCorrect = !!(
+                        a.isCorrect || 
+                        a.correct_answer || 
+                        a.iscorrect || 
+                        (questionResult?.systemAnswers?.some(s => (s.id ?? s) === a.id))
+                    );
                     const isUserChosen = isSelected || !!(questionResult?.userAnswers?.includes(a.id));
 
                     let cardClass = 'option-card';
@@ -154,8 +191,9 @@ const Question = (props) => {
                             key={a.id || idx}
                             className={cardClass}
                             onClick={() => handleSelectAnswer(a.id)}
-                            role="button"
-                            tabIndex={0}
+                            role={isMultipleChoice ? "checkbox" : "radio"}
+                            aria-checked={isSelected}
+                            tabIndex={isReviewMode ? -1 : 0}
                             onKeyDown={(e) => {
                                 if (e.key === ' ' || e.key === 'Enter') {
                                     e.preventDefault();
@@ -166,11 +204,11 @@ const Question = (props) => {
                             <span className="option-letter">{letter}</span>
                             <span className="option-text">{a.description}</span>
                             
-                            {/* Chế độ thi: Hiển thị tick; Chế độ Review: Hiển thị badge kết quả */}
+                            {/* In exam mode: show selection indicator; in Review mode: show reviewTag */}
                             {isReviewMode ? (
                                 reviewTag
                             ) : (
-                                <span className="check-indicator">
+                                <span className={`check-indicator ${isMultipleChoice ? 'box' : 'circle'}`}>
                                     {isSelected ? '✓' : ''}
                                 </span>
                             )}
@@ -179,7 +217,7 @@ const Question = (props) => {
                 })}
             </div>
 
-            {/* Banner Gia Sư Ảo Quizzy cho những câu làm sai */}
+            {/* Mascot Quizzy Callout for wrong answers in Review Mode */}
             {isReviewMode && isQuestionWrong && (
                 <div className="quizzy-wrong-callout">
                     <div className="callout-left">
@@ -204,7 +242,7 @@ const Question = (props) => {
                 </div>
             )}
 
-            {/* Lời giải thích chi tiết trong chế độ Review */}
+            {/* Detailed Explanation Box in Review Mode */}
             {isReviewMode && (
                 <div className="question-explanation-box">
                     <div className="exp-header">
@@ -247,4 +285,3 @@ const Question = (props) => {
 };
 
 export default Question;
-

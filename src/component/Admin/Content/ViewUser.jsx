@@ -1,173 +1,124 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { FcPlus } from "react-icons/fc"
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { putUpdateUser } from '../../sevices/apiService'
 import _ from "lodash";
-function ViewUser(props) {
-    const { show, setShow, dataUpdate, featchListUser, resetUpdateUser } = props;
 
-    const handleClose = () => {
-        setShow(false)
-        setEmail('');
-        setPassword('');
-        setUsername('');
-        setRole('USER');
-        setImage(null);
-        setPreviewImage('');
-        props.resetUpdateUser();
-    };
-    const handleShow = () => setShow(true);
+function ViewUser(props) {
+    const { show, setShow, dataUpdate, resetUpdateUser } = props;
 
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
     const [role, setRole] = useState('USER');
-    const [image, setImage] = useState(null);
     const [previewImage, setPreviewImage] = useState('');
 
-    function HandleUploadImage(event) {
-        if (event.target && event.target.files && event.target.files[0]) {
-            setPreviewImage(URL.createObjectURL(event.target.files[0]));
-            setImage(event.target.files[0]);
-        }
-        else {
-            setPreviewImage('');
-            setImage(null);
-        }
-    }
-
-    const validateEmail = (email) => {
-        return String(email)
-            .toLowerCase()
-            .match(
-                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-            );
+    const handleClose = () => {
+        setShow(false);
+        if (resetUpdateUser) resetUpdateUser();
     };
-
-
-    const handleSubmitCreateUser = async () => {
-        //validate 
-        const isValidEmail = validateEmail(email);
-        if (!isValidEmail) {
-            toast.error('Invalid email address');
-            return;
-        }
-
-        //api create user
-
-        // let data = {
-        //     email: email,
-        //     password: password,
-        //     username: username,
-        //     role: role,
-        //     userImage: image
-        // }
-
-        let res = await putUpdateUser(dataUpdate.id, username, role, image);
-        console.log('Response from create user:', res);
-
-        if (res && res.data && res.data.EC === 0) {
-            toast.success(res.data.EM);
-            handleClose();
-            await props.featchListUser();
-            //clear form
-        } else {
-            toast.error(res.data.EM);
-        }
-    }
-
-    useEffect(() => {
-        console.log('Preview image updated:', previewImage);
-    }, [previewImage]);
 
     useEffect(() => {
         if (!_.isEmpty(dataUpdate)) {
             setEmail(dataUpdate.email || '');
             setUsername(dataUpdate.username || '');
             setRole(dataUpdate.role || 'USER');
-            setImage(null);
             if (dataUpdate.image) {
-                setPreviewImage(`data:image/jpeg;base64,${dataUpdate.image}`);
+                const src = dataUpdate.image.startsWith('data:') || dataUpdate.image.startsWith('http')
+                    ? dataUpdate.image
+                    : `data:image/jpeg;base64,${dataUpdate.image}`;
+                setPreviewImage(src);
             } else {
                 setPreviewImage('');
             }
         }
     }, [dataUpdate]);
 
-
     return (
-        <>
-            {/* <Button variant="primary" onClick={handleShow} id="add-user-button">
-                Launch demo modal
-            </Button> */}
+        <Modal
+            show={show}
+            onHide={handleClose}
+            size="lg"
+            backdrop="static"
+            className="modal-view-user"
+        >
+            <Modal.Header closeButton>
+                <Modal.Title className="fw-bold fs-5 text-dark">
+                    🔍 Chi Tiết Thông Tin Thí Sinh / Người Dùng
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <div className="row g-3">
+                    <div className="col-12 col-md-4 text-center">
+                        <div
+                            style={{
+                                width: '130px',
+                                height: '130px',
+                                borderRadius: '50%',
+                                margin: '0 auto 12px',
+                                overflow: 'hidden',
+                                border: '3px solid #e2e8f0',
+                                backgroundColor: '#f1f5f9',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
+                            }}
+                        >
+                            {previewImage ? (
+                                <img
+                                    src={previewImage}
+                                    alt="Ảnh đại diện"
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                            ) : (
+                                <div style={{ fontSize: '2.5rem', color: '#94a3b8' }}>
+                                    {(username || 'U').charAt(0).toUpperCase()}
+                                </div>
+                            )}
+                        </div>
+                        <span
+                            className={`badge ${role === 'ADMIN' ? 'bg-primary' : 'bg-success'}`}
+                            style={{ fontSize: '0.85rem', padding: '6px 14px', borderRadius: '14px' }}
+                        >
+                            {role}
+                        </span>
+                    </div>
 
-            <Modal
-                show={show}
-                onHide={handleClose}
-                size="xl"
-                backdrop="static"
-                className='modal-add-user'
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>View a use</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <form className="row g-3">
-                        <div className="col-md-6">
-                            <label htmlFor="inputEmail4" className="form-label">Email</label>
-                            <input
-                                type="email"
-                                id="inputEmail4"
-                                className="form-control"
-                                value={email}
-                                disabled
-                                onChange={(e) => setEmail(e.target.value)} />
-                        </div>
-                        <div className="col-md-6">
-                            <label htmlFor="inputPassword4" className="form-label">Password</label>
-                            <input type="password" id="inputPassword4" className="form-control" value={password} disabled onChange={(e) => setPassword(e.target.value)} />
-                        </div>
-                        <div className="col-md-6">
-                            <label htmlFor="inputUsername" className="form-label">Username</label>
-                            <input type="text" id="inputUsername" className="form-control" value={username} disabled onChange={(e) => setUsername(e.target.value)} />
-                        </div>
-                        <div className="col-md-4">
-                            <label className="form-label">Role</label>
-                            <select className="form-select" value={role} disabled onChange={(e) => setRole(e.target.value)}>
-                                <option value="USER">USER</option>
-                                <option value="ADMIN">ADMIN</option>
-                            </select>
-                        </div>
-                        <div className='col-md-16'>
-                            <label className="label-upload" htmlFor='upload-photo'>
-                                <FcPlus />
-                                Upload file image
+                    <div className="col-12 col-md-8">
+                        <div className="mb-3">
+                            <label className="form-label text-muted fw-semibold mb-1" style={{ fontSize: '0.85rem' }}>
+                                ID NGƯỜI DÙNG
                             </label>
-                            <input type="file" id='upload-photo' hidden
-                                disabled
-                                onChange={HandleUploadImage}
-                            />
+                            <div className="form-control bg-light fw-bold text-dark">
+                                #{dataUpdate?.id || '--'}
+                            </div>
                         </div>
-                        <div className='col-md-12 img-preview'>
-                            {
-                                previewImage ?
-                                    <img src={previewImage} alt="Preview" />
-                                    :
-                                    <span>Preview Image</span>
-                            }
+
+                        <div className="mb-3">
+                            <label className="form-label text-muted fw-semibold mb-1" style={{ fontSize: '0.85rem' }}>
+                                HỌ VÀ TÊN / USERNAME
+                            </label>
+                            <div className="form-control bg-light text-dark">
+                                {username || '--'}
+                            </div>
                         </div>
-                    </form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </>
+
+                        <div className="mb-3">
+                            <label className="form-label text-muted fw-semibold mb-1" style={{ fontSize: '0.85rem' }}>
+                                ĐỊA CHỈ EMAIL
+                            </label>
+                            <div className="form-control bg-light text-dark">
+                                {email || '--'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Đóng
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 }
 

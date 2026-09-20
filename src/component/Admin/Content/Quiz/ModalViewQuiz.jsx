@@ -1,94 +1,123 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import _ from 'lodash';
-import './ModalViewQuiz.scss'
-import { FcPlus } from "react-icons/fc"
+import './ModalViewQuiz.scss';
+
 const ModalViewQuiz = (props) => {
     const { show, setShow, dataModal, resetViewDataModal } = props;
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [quizType, setQuizType] = useState('');
+    const [quizType, setQuizType] = useState('EASY');
     const [image, setImage] = useState(null);
 
     const handleClose = () => {
         setName('');
         setDescription('');
-        setQuizType('');
+        setQuizType('EASY');
         setImage(null);
         setShow(false);
-        props.resetViewDataModal();
-    }
+        if (resetViewDataModal) resetViewDataModal();
+    };
 
     useEffect(() => {
         if (show && !_.isEmpty(dataModal)) {
             setName(dataModal.name || '');
             setDescription(dataModal.description || '');
-            setQuizType(dataModal.difficulty || '');
+            setQuizType(dataModal.difficulty || 'EASY');
             setImage(dataModal.image || null);
         }
     }, [show, dataModal]);
 
+    const getDifficultyLabel = (diff) => {
+        switch ((diff || '').toUpperCase()) {
+            case 'EASY': return 'Dễ (Easy)';
+            case 'MEDIUM': return 'Trung bình (Medium)';
+            case 'HARD': return 'Khó (Hard)';
+            default: return diff || 'Chưa xác định';
+        }
+    };
+
+    const imageSrc = image
+        ? (image.startsWith('data:') || image.startsWith('http') ? image : `data:image/jpeg;base64,${image}`)
+        : null;
+
     return (
-        <>
-            <Modal
-                show={show}
-                onHide={handleClose}
-                size="xl"
-                backdrop="static"
-            >
-                <Modal.Header closeButton>
-                    <Modal.Title>View Quiz</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <form className="row g-3">
-                        <div className="col-md-6">
-                            <label htmlFor="inputName4" className="form-label">Name</label>
-                            <input type="text" className="form-control" id="inputName4" value={name} disabled />
+        <Modal
+            show={show}
+            onHide={handleClose}
+            size="lg"
+            backdrop="static"
+        >
+            <Modal.Header closeButton>
+                <Modal.Title className="fw-bold fs-5 text-dark">
+                    🔍 Chi Tiết Đề Thi #{dataModal?.id}
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <div className="row g-3">
+                    <div className="col-md-6">
+                        <label className="form-label text-muted fw-semibold mb-1" style={{ fontSize: '0.85rem' }}>
+                            TÊN BÀI THI
+                        </label>
+                        <div className="form-control bg-light fw-bold text-dark">
+                            {name || '--'}
                         </div>
-                        <div className="col-md-6">
-                            <label htmlFor="inputState" className="form-label">Type</label>
-                            <select id="inputState" className="form-select" value={quizType} disabled>
-                                <option value="EASY">Easy</option>
-                                <option value="MEDIUM">Medium</option>
-                                <option value="HARD">Hard</option>
-                            </select>
+                    </div>
+                    <div className="col-md-6">
+                        <label className="form-label text-muted fw-semibold mb-1" style={{ fontSize: '0.85rem' }}>
+                            MỨC ĐỘ KHÓ
+                        </label>
+                        <div className="form-control bg-light text-dark">
+                            {getDifficultyLabel(quizType)}
                         </div>
-                        <div className="col-12">
-                            <label htmlFor="inputDescription" className="form-label">Description</label>
-                            <input type="text" className="form-control" id="inputDescription" value={description} disabled />
+                    </div>
+                    <div className="col-12">
+                        <label className="form-label text-muted fw-semibold mb-1" style={{ fontSize: '0.85rem' }}>
+                            MÔ TẢ NỘI DUNG
+                        </label>
+                        <div className="form-control bg-light text-dark" style={{ minHeight: '60px' }}>
+                            {description || 'Không có mô tả'}
                         </div>
-                        <div className='col-md-16'>
-                            <label className="label-upload" htmlFor='upload-photo'>
-                                <FcPlus />
-                                Upload file image
-                            </label>
-                            <input type="file" id='upload-photo' hidden
-                                disabled
-                            />
+                    </div>
+                    <div className="col-12">
+                        <label className="form-label text-muted fw-semibold mb-1" style={{ fontSize: '0.85rem' }}>
+                            ẢNH BÌA ĐỀ THI
+                        </label>
+                        <div
+                            style={{
+                                width: '100%',
+                                maxHeight: '240px',
+                                border: '1px solid #e2e8f0',
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                backgroundColor: '#f8fafc',
+                                padding: '12px',
+                                overflow: 'hidden'
+                            }}
+                        >
+                            {imageSrc ? (
+                                <img
+                                    src={imageSrc}
+                                    alt="Ảnh minh họa đề thi"
+                                    style={{ maxHeight: '210px', maxWidth: '100%', objectFit: 'contain' }}
+                                />
+                            ) : (
+                                <span className="text-muted">Đề thi chưa có ảnh bìa</span>
+                            )}
                         </div>
-                        <div className='col-md-12 d-flex justify-content-center '>
-                            {
-                                image ?
-                                    <img src={`data:image/png;base64,${image}`}
-                                        alt="Image Quiz"
-                                        style={{ maxWidth: '600px', height: 'auto' }}
-                                        className="img-preview"
-                                    />
-                                    :
-                                    <span>Image Quiz</span>
-                            }
-                        </div>
-                    </form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </>
+                    </div>
+                </div>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Đóng
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
-}
+};
 
 export default ModalViewQuiz;

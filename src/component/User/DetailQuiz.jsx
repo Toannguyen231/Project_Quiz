@@ -1,324 +1,439 @@
-import { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import Modal from 'react-bootstrap/Modal';
+import { toast } from "react-toastify";
+import _ from "lodash";
 import { getQuestionsByQuizId, postSubmitQuiz } from '../sevices/apiService';
 import { recordQuizCompletion } from '../sevices/gamificationService';
-import _ from "lodash";
-import './DetailQuiz.scss';
+import useTimer, { formatTimer } from "../../hooks/useTimer";
+import useExamProgress from "../../hooks/useExamProgress";
+import { calculateScore } from "../../utils/score";
 import Question from "./Question";
+import QuestionPalette from "./QuestionPalette";
 import ModalResult from "./ModalResult";
+import './DetailQuiz.scss';
 
-const Detail = () => {
+const DetailQuiz = () => {
     const params = useParams();
     const location = useLocation();
     const navigate = useNavigate();
     const quizId = params.id;
-    const quizDuration = (location?.state?.duration || 10) * 60; // phút → giây
-    const storageKey = `quiz_progress_${quizId}`;
+    const authUser = useSelector((state) => state.user?.account || state.user?.user || null);
+    const userId = authUser?.id || null;
 
+    const quizDurationMinutes = location?.state?.duration || 10;
+    const totalDurationSeconds = quizDurationMinutes * 60;
+
+    // Exam States
     const [dataQuiz, setDataQuiz] = useState([]);
     const [index, setIndex] = useState(0);
-    const [isShowModalResult, setIsShowModalResult] = useState(false);
-    const [dataModalResult, setDataModalResult] = useState({});
-    const [timeLeft, setTimeLeft] = useState(quizDuration);
+    const [isLoading, setIsLoading] = useState(true);
     const [isSubmitted, setIsSubmitted] = useState(false);
-
-    // 1. Tính năng Đánh dấu xem lại (Flag Question): lưu danh sách questionId được cắm cờ
-    const [flaggedQuestions, setFlaggedQuestions] = useState([]);
-
-    // 3. Chế độ Xem lại lời giải chi tiết (Review Answers): Read-only mode sau khi nộp bài
     const [isReviewMode, setIsReviewMode] = useState(false);
 
-    // Fetch dữ liệu câu hỏi và khôi phục tiến trình từ LocalStorage
+    // Modals
+    const [isShowModalResult, setIsShowModalResult] = useState(false);
+    const [dataModalResult, setDataModalResult] = useState({});
+    const [showConfirmSubmitModal, setShowConfirmSubmitModal] = useState(false);
+    const [showTabSwitchWarning, setShowTabSwitchWarning] = useState(false);
+    const [tabWarningMessage, setTabWarningMessage] = useState("");
+
+    // Flagged questions
+    const [flaggedQuestions, setFlaggedQuestions] = useState([]);
+
+    // Custom Hook: useExamProgress
+    const {
+        loadProgress,
+        saveProgress,
+        clearProgress,
+        lastSavedAt
+    } = useExamProgress(quizId, userId);
+
+    // Time spent tracking
+    const startTimeRef = useRef(Date.now());
+    const finalTimeSpentRef = useRef(null);
+
+    // Forward declaration of handleFinish
+    const isSubmittedRef = useRef(false);
+    isSubmittedRef.current = isSubmitted;
+
+    // Custom Hook: useTimer
+    const {
+        timeLeft,
+        formattedTime,
+        timerStatus,
+        isWarning,
+        isDanger,
+        tabSwitchCount,
+        pauseTimer,
+        resumeTimer,
+        setTimeLeft,
+    } = useTimer({
+        initialSeconds: totalDurationSeconds,
+        autoStart: !isSubmitted && !isReviewMode,
+        pauseOnBlur: !isSubmitted && !isReviewMode,
+        onTimeUp: () => {
+            if (!isSubmittedRef.current) {
+                toast.error("⏱ Đã hết thời gian làm bài! Hệ thống đang tự động nộp bài của bạn...");
+                handleFinishSubmit();
+            }
+        },
+        onTabSwitch: (count) => {
+            if (isSubmittedRef.current || isReviewMode) return;
+
+            if (count >= 4) {
+                toast.error("🚨 Vi phạm quy chế thi: Rời màn hình quá 3 lần! Bài thi của bạn đã bị tự động nộp.");
+                handleFinishSubmit();
+            } else {
+                setTabWarningMessage(
+                    `Bạn vừa rời khỏi màn hình thi (${count}/3 lần). Nghiêm cấm chuyển tab hoặc mở ứng dụng khác trong khi làm bài!`
+                );
+                setShowTabSwitchWarning(true);
+                toast.warning(`⚠️ Cảnh báo gian lận (${count}/3 lần): Vui lòng tập trung làm bài thi!`);
+            }
+        }
+    });
+
+    // Build current answersMap for progress saving and palette
+    const currentAnswersMap = useMemo(() => {
+        const map = {};
+        dataQuiz.forEach((q) => {
+            const qId = q.questionId;
+            const selected = (q.answers || []).filter((a) => a.isSelected).map((a) => a.id);
+            if (selected.length > 0) {
+                map[qId] = selected;
+            }
+        });
+        return map;
+    }, [dataQuiz]);
+
+    // Fetch quiz questions & restore progress
     const fetchQuizDetails = useCallback(async (id) => {
+        setIsLoading(true);
         try {
-            let res = await getQuestionsByQuizId(id);
+            const res = await getQuestionsByQuizId(id);
             if (res && res.data && res.data.EC === 0 && res.data.DT && res.data.DT.length > 0) {
-                let raw = res.data.DT;
-                let data = _.chain(raw)
+                const raw = res.data.DT;
+                const grouped = _.chain(raw)
                     .groupBy("id")
                     .map((value, key) => {
-                        let answers = [];
+                        const answers = [];
                         let questionDescription = "";
                         let image = null;
                         let explanation = "";
+                        let type = "SINGLE";
                         value.forEach((item, idx) => {
                             if (idx === 0) {
                                 questionDescription = item.description;
                                 image = item.image;
                                 explanation = item.explanation || "";
+                                type = item.type || "SINGLE";
                             }
-                            item.answers.isSelected = false;
-                            answers.push(item.answers);
+                            if (item.answers) {
+                                answers.push({
+                                    ...item.answers,
+                                    isSelected: false
+                                });
+                            }
                         });
-                        return { questionId: key, answers, questionDescription, image, explanation };
+                        return {
+                            questionId: key,
+                            answers,
+                            questionDescription,
+                            image,
+                            explanation,
+                            type
+                        };
                     })
                     .value();
 
-                // 2. Tự động khôi phục tiến trình làm bài từ LocalStorage khi tải lại trang (F5)
-                try {
-                    const saved = localStorage.getItem(`quiz_progress_${id}`);
-                    if (saved) {
-                        const parsed = JSON.parse(saved);
-                        if (parsed) {
-                            // Khôi phục câu trả lời đã chọn
-                            if (parsed.answersMap) {
-                                data.forEach(q => {
-                                    const savedAnswers = parsed.answersMap[q.questionId] || [];
-                                    q.answers.forEach(a => {
-                                        if (savedAnswers.includes(a.id)) {
-                                            a.isSelected = true;
-                                        }
-                                    });
-                                });
-                            }
-                            // Khôi phục danh sách câu cắm cờ
-                            if (Array.isArray(parsed.flaggedQuestions)) {
-                                setFlaggedQuestions(parsed.flaggedQuestions);
-                            }
-                            // Khôi phục thời gian làm bài còn lại
-                            if (typeof parsed.timeLeft === 'number' && parsed.timeLeft > 0) {
-                                setTimeLeft(parsed.timeLeft);
-                            }
-                            // Khôi phục vị trí câu hỏi đang làm dở
-                            if (typeof parsed.index === 'number' && parsed.index >= 0 && parsed.index < data.length) {
-                                setIndex(parsed.index);
-                            }
-                        }
+                // Restore saved progress from useExamProgress hook
+                const saved = loadProgress();
+                if (saved) {
+                    if (saved.answersMap) {
+                        grouped.forEach((q) => {
+                            const selectedIds = saved.answersMap[q.questionId] || [];
+                            q.answers.forEach((a) => {
+                                if (selectedIds.includes(a.id)) {
+                                    a.isSelected = true;
+                                }
+                            });
+                        });
                     }
-                } catch (storageErr) {
-                    console.warn("Lỗi khi đọc dữ liệu khôi phục từ LocalStorage:", storageErr);
+
+                    if (Array.isArray(saved.flaggedQuestions)) {
+                        setFlaggedQuestions(saved.flaggedQuestions);
+                    }
+
+                    if (typeof saved.timeLeft === 'number' && saved.timeLeft > 0) {
+                        setTimeLeft(saved.timeLeft);
+                    }
+
+                    if (typeof saved.currentIndex === 'number' && saved.currentIndex >= 0 && saved.currentIndex < grouped.length) {
+                        setIndex(saved.currentIndex);
+                    }
+
+                    toast.info("💾 Đã khôi phục tiến trình làm bài trước đó của bạn!");
                 }
 
-                setDataQuiz(data);
+                setDataQuiz(grouped);
+            } else {
+                toast.error("Không thể tải danh sách câu hỏi cho bài thi này.");
             }
-        } catch (e) {
-            console.warn("Lỗi tải câu hỏi:", e);
+        } catch (err) {
+            console.error("Lỗi khi tải dữ liệu bài thi:", err);
+            toast.error("Lỗi kết nối khi tải bài thi. Vui lòng thử lại sau.");
+        } finally {
+            setIsLoading(false);
         }
-    }, []);
+    }, [loadProgress, setTimeLeft]);
 
     useEffect(() => {
         fetchQuizDetails(quizId);
     }, [quizId, fetchQuizDetails]);
 
-    // 2. Tự động lưu tiến độ vào LocalStorage (Auto-save State) mỗi khi có thay đổi
+    // Auto-save progress whenever answers, flags, time or index change
     useEffect(() => {
-        // Chỉ lưu khi bài thi đang diễn ra, chưa nộp và chưa vào chế độ Review
         if (!quizId || dataQuiz.length === 0 || isSubmitted || isReviewMode) return;
 
-        try {
-            const answersMap = {};
-            dataQuiz.forEach(q => {
-                const selected = q.answers.filter(a => a.isSelected).map(a => a.id);
-                if (selected.length > 0) {
-                    answersMap[q.questionId] = selected;
-                }
-            });
+        saveProgress({
+            answersMap: currentAnswersMap,
+            timeLeft,
+            flaggedQuestions,
+            currentIndex: index,
+            tabSwitchCount,
+        });
+    }, [quizId, dataQuiz, currentAnswersMap, timeLeft, flaggedQuestions, index, tabSwitchCount, isSubmitted, isReviewMode, saveProgress]);
 
-            const progressData = {
-                quizId,
-                answersMap,
-                timeLeft,
-                flaggedQuestions,
-                index,
-                lastSavedAt: Date.now()
-            };
-
-            localStorage.setItem(storageKey, JSON.stringify(progressData));
-        } catch (err) {
-            console.warn("Không thể lưu tiến trình vào LocalStorage:", err);
-        }
-    }, [quizId, dataQuiz, timeLeft, flaggedQuestions, index, isSubmitted, isReviewMode, storageKey]);
-
-    // Xử lý nộp bài thi
-    const handleFinish = useCallback(async () => {
+    // Handle Finish & Submission
+    const handleFinishSubmit = useCallback(async () => {
         if (isSubmitted) return;
         setIsSubmitted(true);
+        setShowConfirmSubmitModal(false);
+        pauseTimer();
 
-        // Gamification: Ghi nhận hoàn thành bài quiz để cập nhật chuỗi Streak 🔥
-        recordQuizCompletion();
+        // Calculate time spent
+        const elapsedSeconds = Math.max(0, totalDurationSeconds - timeLeft);
+        const formattedTimeSpent = formatTimer(elapsedSeconds);
+        finalTimeSpentRef.current = formattedTimeSpent;
 
-        // Xóa sạch dữ liệu lưu tạm trong LocalStorage khi đã nộp bài thành công
+        // Record streak
         try {
-            localStorage.removeItem(storageKey);
+            recordQuizCompletion();
         } catch (e) {
-            console.warn("Lỗi xóa LocalStorage:", e);
+            /* ignore */
         }
 
-        let payload = {
+        // Clean up localStorage for this quiz
+        clearProgress();
+
+        // Prepare submission payload
+        const payload = {
             quizId: +quizId,
             answers: []
         };
 
-        if (dataQuiz && dataQuiz.length > 0) {
-            dataQuiz.forEach(item => {
-                let questionId = item.questionId;
-                let userAnswerId = [];
-                item.answers.forEach(a => {
-                    if (a.isSelected === true) {
-                        userAnswerId.push(a.id);
-                    }
-                });
-                payload.answers.push({
-                    questionId: +questionId,
-                    userAnswerId: userAnswerId
-                });
+        dataQuiz.forEach((q) => {
+            const userAnswerId = (q.answers || [])
+                .filter((a) => a.isSelected)
+                .map((a) => a.id);
+            payload.answers.push({
+                questionId: +q.questionId,
+                userAnswerId,
             });
+        });
 
-            try {
-                let res = await postSubmitQuiz(payload);
-                if (res && res.data && res.data.EC === 0) {
-                    // Trộn dữ liệu chi tiết giữa backend và frontend để phục vụ Review Mode
-                    const mergedQuizData = dataQuiz.map(q => {
-                        const backendQ = res.data.DT.quizData?.find(item => +item.questionId === +q.questionId);
-                        const userAnswers = q.answers.filter(a => a.isSelected).map(a => a.id);
-                        const systemAnswers = backendQ?.systemAnswers || q.answers.filter(a => a.isCorrect || a.correct_answer);
-                        const isCorrect = backendQ ? !!backendQ.isCorrect : (
-                            systemAnswers.length > 0 &&
-                            systemAnswers.length === userAnswers.length &&
-                            systemAnswers.every(id => userAnswers.includes(id))
-                        );
-                        return {
-                            questionId: q.questionId,
-                            questionDescription: q.questionDescription,
-                            isCorrect,
-                            userAnswers,
-                            allAnswers: q.answers,
-                            systemAnswers: q.answers.filter(a => a.isCorrect || a.correct_answer)
-                        };
-                    });
+        // Try submitting to Backend API
+        let apiSucceeded = false;
+        try {
+            const res = await postSubmitQuiz(payload);
+            if (res && res.data && res.data.EC === 0) {
+                apiSucceeded = true;
+                const dt = res.data.DT;
 
-                    setDataModalResult({
-                        countCorrect: res.data.DT.countCorrect,
-                        countTotal: res.data.DT.countTotal || dataQuiz.length,
-                        quizData: mergedQuizData
-                    });
-                    setIsShowModalResult(true);
-                    return;
-                }
-            } catch (err) {
-                console.warn("Submit API gặp lỗi, chuyển sang tính điểm offline:", err);
+                // Merge server results with question data for review mode
+                const mergedQuizData = dataQuiz.map((q) => {
+                    const backendQ = dt.quizData?.find((item) => +(item.questionId ?? item.id) === +q.questionId);
+                    const userAnswers = (q.answers || []).filter((a) => a.isSelected).map((a) => a.id);
+                    const systemAnswers = backendQ?.systemAnswers || (q.answers || []).filter((a) => a.isCorrect || a.correct_answer || a.iscorrect);
+
+                    const isCorrect = backendQ ? !!backendQ.isCorrect : (
+                        systemAnswers.length > 0 &&
+                        systemAnswers.length === userAnswers.length &&
+                        systemAnswers.every((id) => userAnswers.includes(id))
+                    );
+
+                    return {
+                        questionId: q.questionId,
+                        questionDescription: q.questionDescription,
+                        isCorrect,
+                        userAnswers,
+                        allAnswers: q.answers,
+                        systemAnswers: (q.answers || []).filter((a) => a.isCorrect || a.correct_answer || a.iscorrect),
+                        explanation: q.explanation,
+                    };
+                });
+
+                const countCorrect = dt.countCorrect ?? mergedQuizData.filter(m => m.isCorrect).length;
+                const countTotal = dt.countTotal ?? dataQuiz.length;
+                const percentage = countTotal > 0 ? Math.round((countCorrect / countTotal) * 100) : 0;
+                const score = Number(((countCorrect / countTotal) * 10).toFixed(1));
+
+                setDataModalResult({
+                    countCorrect,
+                    countTotal,
+                    score,
+                    percentage,
+                    timeSpent: formattedTimeSpent,
+                    quizData: mergedQuizData,
+                });
+                setIsShowModalResult(true);
+                toast.success("🎉 Nộp bài thi thành công!");
+                return;
             }
-
-            // Fallback tính điểm offline
-            let countCorrect = 0;
-            let quizData = dataQuiz.map(item => {
-                let userAnswers = item.answers.filter(a => a.isSelected).map(a => a.id);
-                let correctAnswers = item.answers.filter(a => a.isCorrect || a.correct_answer).map(a => a.id);
-                let isCorrect = correctAnswers.length > 0 &&
-                    correctAnswers.length === userAnswers.length &&
-                    correctAnswers.every(id => userAnswers.includes(id));
-                if (isCorrect) countCorrect++;
-
-                return {
-                    questionId: item.questionId,
-                    questionDescription: item.questionDescription,
-                    isCorrect: isCorrect,
-                    userAnswers: userAnswers,
-                    allAnswers: item.answers,
-                    systemAnswers: item.answers.filter(a => a.isCorrect || a.correct_answer)
-                };
-            });
-
-            setDataModalResult({
-                countCorrect: countCorrect,
-                countTotal: dataQuiz.length,
-                quizData: quizData
-            });
-            setIsShowModalResult(true);
+        } catch (err) {
+            console.warn("Backend submit error, using pure score calculation fallback:", err);
         }
-    }, [isSubmitted, quizId, dataQuiz, storageKey]);
 
-    // Timer countdown (chỉ đếm khi chưa nộp và chưa vào review mode)
-    useEffect(() => {
-        if (isSubmitted || isReviewMode) return;
-        if (timeLeft <= 0) {
-            handleFinish();
-            return;
-        }
-        const timer = setInterval(() => {
-            setTimeLeft(prev => prev - 1);
-        }, 1000);
-        return () => clearInterval(timer);
-    }, [timeLeft, isSubmitted, isReviewMode, handleFinish]);
+        // Pure calculation fallback via calculateScore utility
+        const calculated = calculateScore(dataQuiz, payload.answers);
+        const mergedOfflineQuizData = dataQuiz.map((q) => {
+            const detail = calculated.details.find((d) => String(d.questionId) === String(q.questionId));
+            return {
+                questionId: q.questionId,
+                questionDescription: q.questionDescription,
+                isCorrect: detail ? detail.isCorrect : false,
+                userAnswers: detail ? detail.userAnswers.map(Number) : [],
+                allAnswers: q.answers,
+                systemAnswers: (q.answers || []).filter((a) => a.isCorrect || a.correct_answer || a.iscorrect),
+                explanation: q.explanation,
+            };
+        });
 
-    const formatTime = (seconds) => {
-        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-        const s = (seconds % 60).toString().padStart(2, '0');
-        return `${m}:${s}`;
-    };
+        setDataModalResult({
+            countCorrect: calculated.countCorrect,
+            countTotal: calculated.total,
+            countIncorrect: calculated.countIncorrect,
+            countUnanswered: calculated.countUnanswered,
+            score: calculated.score,
+            percentage: calculated.percentage,
+            timeSpent: formattedTimeSpent,
+            quizData: mergedOfflineQuizData,
+        });
+        setIsShowModalResult(true);
+        toast.info("Đã hoàn tất chấm điểm bài thi!");
+    }, [isSubmitted, quizId, dataQuiz, totalDurationSeconds, timeLeft, pauseTimer, clearProgress]);
 
-    const handlePrev = () => {
-        if (index <= 0) return;
-        setIndex(index - 1);
-    };
-
-    const handleNext = () => {
-        if (index >= dataQuiz.length - 1) return;
-        setIndex(index + 1);
-    };
-
-    // Chọn đáp án (vô hiệu hóa khi ở chế độ Review)
+    // Handle Option Selection
     const handleCheckBox = (answerId, questionId) => {
         if (isSubmitted || isReviewMode) return;
-        let dataQuizClone = _.cloneDeep(dataQuiz);
-        let question = dataQuizClone.find(item => +item.questionId === +questionId);
-        if (question && question.answers) {
-            question.answers = question.answers.map(item => {
-                if (+item.id === +answerId) {
-                    item.isSelected = !item.isSelected;
+
+        setDataQuiz((prev) => {
+            const next = _.cloneDeep(prev);
+            const targetQ = next.find((q) => +q.questionId === +questionId);
+            if (targetQ && targetQ.answers) {
+                // If single-choice, deselect other answers
+                if (targetQ.type === 'SINGLE') {
+                    targetQ.answers.forEach((a) => {
+                        if (+a.id === +answerId) {
+                            a.isSelected = !a.isSelected;
+                        } else {
+                            a.isSelected = false;
+                        }
+                    });
+                } else {
+                    // Multiple-choice toggle
+                    targetQ.answers.forEach((a) => {
+                        if (+a.id === +answerId) {
+                            a.isSelected = !a.isSelected;
+                        }
+                    });
                 }
-                return item;
-            });
-        }
-        let qIdx = dataQuizClone.findIndex(item => +item.questionId === +questionId);
-        if (qIdx > -1) {
-            dataQuizClone[qIdx] = question;
-            setDataQuiz(dataQuizClone);
-        }
+            }
+            return next;
+        });
     };
 
-    // 1. Cắm cờ / Bỏ cắm cờ câu hỏi
+    // Flag toggle
     const handleToggleFlag = (qId) => {
         if (!qId) return;
-        setFlaggedQuestions(prev => {
+        setFlaggedQuestions((prev) => {
             return prev.includes(qId)
-                ? prev.filter(id => id !== qId)
+                ? prev.filter((id) => id !== qId)
                 : [...prev, qId];
         });
     };
 
-    const handleConfirmSubmit = () => {
-        const unanswered = dataQuiz.filter(q => !q.answers.some(a => a.isSelected)).length;
-        let confirmMsg = "Bạn có chắc chắn muốn nộp bài thi ngay?";
-        if (unanswered > 0) {
-            confirmMsg = `Bạn vẫn còn ${unanswered} câu chưa trả lời! Bạn có chắc chắn muốn nộp bài không?`;
-        }
-        if (window.confirm(confirmMsg)) {
-            handleFinish();
-        }
+    // Navigation
+    const handlePrev = () => {
+        if (index > 0) setIndex(index - 1);
     };
 
+    const handleNext = () => {
+        if (index < dataQuiz.length - 1) setIndex(index + 1);
+    };
+
+    // Prompt before submitting
+    const handleOpenSubmitConfirmation = () => {
+        setShowConfirmSubmitModal(true);
+    };
+
+    // Exit exam
     const handleExit = () => {
-        if (window.confirm("Bạn có chắc muốn thoát bài thi? Toàn bộ tiến trình tạm thời sẽ bị xóa.")) {
-            try {
-                localStorage.removeItem(storageKey);
-            } catch (e) {
-                console.warn(e);
-            }
+        if (window.confirm("Bạn có chắc chắn muốn thoát phòng thi? Tiến trình tạm thời sẽ bị xóa.")) {
+            clearProgress();
             navigate('/user');
         }
     };
 
-    const answeredCount = dataQuiz.filter(q => q.answers.some(a => a.isSelected)).length;
-    const progressPercent = dataQuiz.length > 0 ? Math.round((answeredCount / dataQuiz.length) * 100) : 0;
-    const timerStatus = timeLeft < 120 ? 'danger' : timeLeft < 300 ? 'warning' : 'normal';
+    // Retry exam
+    const handleRetry = () => {
+        clearProgress();
+        setIsSubmitted(false);
+        setIsReviewMode(false);
+        setDataModalResult({});
+        setTimeLeft(totalDurationSeconds);
+        setIndex(0);
+        setFlaggedQuestions([]);
+        fetchQuizDetails(quizId);
+    };
 
-    const currentQuestion = dataQuiz && dataQuiz.length > 0 ? dataQuiz[index] : {};
+    // Stats
+    const answeredCount = dataQuiz.filter((q) => (q.answers || []).some((a) => a.isSelected)).length;
+    const unansweredCount = dataQuiz.length - answeredCount;
+    const progressPercent = dataQuiz.length > 0 ? Math.round((answeredCount / dataQuiz.length) * 100) : 0;
+
+    const currentQuestion = dataQuiz[index] || {};
     const currentQuestionId = currentQuestion?.questionId;
     const isCurrentFlagged = flaggedQuestions.includes(currentQuestionId);
 
+    if (isLoading) {
+        return (
+            <div className="exam-workspace loading-container">
+                <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
+                    <span className="visually-hidden">Đang tải đề thi...</span>
+                </div>
+                <h4 style={{ marginTop: '16px', color: '#475569', fontWeight: 600 }}>
+                    Đang chuẩn bị đề thi &amp; phòng thi an toàn...
+                </h4>
+            </div>
+        );
+    }
+
     return (
         <div className={`exam-workspace ${isReviewMode ? 'review-mode-active' : ''}`}>
+            {/* Anti-Cheat Floating Tab Switch Warning Banner */}
+            {tabSwitchCount > 0 && !isSubmitted && !isReviewMode && (
+                <div className="anti-cheat-alert-bar">
+                    <span className="alert-icon">⚠️</span>
+                    <span className="alert-text">
+                        Cảnh báo an ninh: Bạn đã rời khỏi phòng thi <strong>{tabSwitchCount}/3 lần</strong>.
+                        {tabSwitchCount >= 3 ? " CẢNH BÁO CUỐI CÙNG: Rời tab thêm một lần nữa bài thi sẽ bị tự động nộp!" : " Vui lòng không chuyển tab."}
+                    </span>
+                </div>
+            )}
+
             {/* Top Bar */}
             <div className="exam-top-bar">
                 <div className="exam-title-wrapper">
@@ -328,7 +443,7 @@ const Detail = () => {
                     </h2>
                 </div>
 
-                {/* Chế độ làm bài: Hiển thị tiến độ & cờ. Chế độ Review: Hiển thị điểm số & banner */}
+                {/* Progress / Review Mode Banner */}
                 {isReviewMode ? (
                     <div className="review-mode-banner">
                         <span className="review-badge-pill">📖 ĐANG XEM LỜI GIẢI CHI TIẾT</span>
@@ -342,7 +457,12 @@ const Detail = () => {
                         <span className="progress-label">
                             Tiến độ: {answeredCount}/{dataQuiz.length} câu ({progressPercent}%)
                             {flaggedQuestions.length > 0 && (
-                                <span className="flag-summary-label"> • 🚩 {flaggedQuestions.length} câu xem lại</span>
+                                <span className="flag-summary-label"> • 🚩 {flaggedQuestions.length} cắm cờ</span>
+                            )}
+                            {lastSavedAt && (
+                                <span className="save-status-indicator" title="Tự động lưu vào trình duyệt">
+                                    • ✓ Đã lưu
+                                </span>
                             )}
                         </span>
                         <div className="progress-bar-track">
@@ -354,6 +474,7 @@ const Detail = () => {
                     </div>
                 )}
 
+                {/* Header Action Buttons */}
                 {isReviewMode ? (
                     <button
                         type="button"
@@ -382,7 +503,9 @@ const Detail = () => {
                             isFlagged={isCurrentFlagged}
                             onToggleFlag={handleToggleFlag}
                             isReviewMode={isReviewMode}
-                            questionResult={dataModalResult?.quizData?.find(item => +item.questionId === +currentQuestionId)}
+                            questionResult={dataModalResult?.quizData?.find(
+                                (item) => +(item.questionId ?? item.id) === +currentQuestionId
+                            )}
                         />
                     </div>
 
@@ -406,7 +529,7 @@ const Detail = () => {
                             </button>
                         </div>
 
-                        {/* Trong chế độ Review: nút chuyển sang mở bảng điểm hoặc quay về */}
+                        {/* Review Mode actions vs Submit action */}
                         {isReviewMode ? (
                             <div className="review-footer-actions">
                                 <button
@@ -428,7 +551,7 @@ const Detail = () => {
                             <button
                                 type="button"
                                 className="btn-submit-exam"
-                                onClick={handleConfirmSubmit}
+                                onClick={handleOpenSubmitConfirmation}
                                 disabled={isSubmitted}
                             >
                                 {isSubmitted ? '✓ Đã hoàn thành' : 'Nộp bài thi ✓'}
@@ -439,8 +562,8 @@ const Detail = () => {
 
                 {/* Right: Exam Monitor Sidebar */}
                 <div className="exam-monitor-sidebar">
-                    {/* Timer Card (Ẩn hoặc đổi sang trạng thái hoàn thành trong Review Mode) */}
-                    <div className="timer-card">
+                    {/* Timer Card */}
+                    <div className={`timer-card ${timerStatus}`}>
                         <div className="timer-label">
                             {isReviewMode ? 'Trạng thái phòng thi' : 'Thời gian còn lại'}
                         </div>
@@ -450,124 +573,169 @@ const Detail = () => {
                             </div>
                         ) : (
                             <div className={`timer-countdown ${timerStatus}`}>
-                                ⏱ {formatTime(timeLeft)}
+                                ⏱ {formattedTime}
+                            </div>
+                        )}
+                        {!isReviewMode && isDanger && (
+                            <div className="timer-alert-danger">
+                                ⚠️ Sắp hết giờ! Vui lòng kiểm tra và nộp bài.
                             </div>
                         )}
                     </div>
 
-                    {/* Question Navigator Matrix */}
-                    <div className="matrix-card">
-                        <div className="matrix-header">
-                            <span className="matrix-title">
-                                {isReviewMode ? 'Kết quả từng câu' : 'Ma trận câu hỏi'}
-                            </span>
-                            <span className="matrix-answered-count">
-                                {isReviewMode
-                                    ? `${dataModalResult?.countCorrect || 0}/${dataQuiz.length} đúng`
-                                    : `${answeredCount}/${dataQuiz.length} đã làm`}
-                            </span>
-                        </div>
-
-                        <div className="questions-matrix-grid">
-                            {dataQuiz.map((q, qIdx) => {
-                                const hasAnswered = q.answers.some(a => a.isSelected);
-                                const isCurrent = qIdx === index;
-                                const isFlagged = flaggedQuestions.includes(q.questionId);
-
-                                let btnClass = 'matrix-btn';
-
-                                if (isReviewMode) {
-                                    // Tô màu đúng/sai trong chế độ Review
-                                    const qResult = dataModalResult?.quizData?.find(item => +item.questionId === +q.questionId);
-                                    if (qResult?.isCorrect) {
-                                        btnClass += ' review-correct';
-                                    } else {
-                                        btnClass += ' review-incorrect';
-                                    }
-                                } else {
-                                    if (hasAnswered) btnClass += ' answered';
-                                }
-
-                                if (isFlagged) btnClass += ' flagged';
-                                if (isCurrent) btnClass += ' current';
-
-                                return (
-                                    <button
-                                        key={q.questionId || qIdx}
-                                        type="button"
-                                        className={btnClass}
-                                        onClick={() => setIndex(qIdx)}
-                                        title={`Chuyển tới câu ${qIdx + 1}${isFlagged ? ' (Đã cắm cờ xem lại)' : ''}`}
-                                    >
-                                        {qIdx + 1}
-                                    </button>
-                                );
-                            })}
-                        </div>
-
-                        {/* Bảng chú thích (Legend) */}
-                        <div className="matrix-legend">
-                            {isReviewMode ? (
-                                <>
-                                    <div className="legend-item">
-                                        <span className="legend-dot correct" />
-                                        <span>Làm đúng (✓)</span>
-                                    </div>
-                                    <div className="legend-item">
-                                        <span className="legend-dot incorrect" />
-                                        <span>Làm sai (✗)</span>
-                                    </div>
-                                    <div className="legend-item">
-                                        <span className="legend-dot current" />
-                                        <span>Đang xem</span>
-                                    </div>
-                                    {flaggedQuestions.length > 0 && (
-                                        <div className="legend-item">
-                                            <span className="legend-dot flagged" />
-                                            <span>Đã cắm cờ (🚩)</span>
-                                        </div>
-                                    )}
-                                </>
-                            ) : (
-                                <>
-                                    <div className="legend-item">
-                                        <span className="legend-dot answered" />
-                                        <span>Đã chọn đáp án</span>
-                                    </div>
-                                    <div className="legend-item">
-                                        <span className="legend-dot flagged" />
-                                        <span>Cắm cờ xem lại (🚩)</span>
-                                    </div>
-                                    <div className="legend-item">
-                                        <span className="legend-dot current" />
-                                        <span>Đang xem</span>
-                                    </div>
-                                    <div className="legend-item">
-                                        <span className="legend-dot unanswered" />
-                                        <span>Chưa trả lời</span>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </div>
+                    {/* Question Palette Navigation */}
+                    <QuestionPalette
+                        questions={dataQuiz}
+                        currentIndex={index}
+                        onSelectQuestion={(idx) => setIndex(idx)}
+                        flaggedQuestions={flaggedQuestions}
+                        isReviewMode={isReviewMode}
+                        reviewResults={dataModalResult?.quizData || []}
+                        answersMap={currentAnswersMap}
+                    />
                 </div>
             </div>
+
+            {/* Submission Confirmation Modal */}
+            <Modal
+                show={showConfirmSubmitModal}
+                onHide={() => setShowConfirmSubmitModal(false)}
+                centered
+                backdrop="static"
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title style={{ fontWeight: 800, fontSize: '1.25rem', color: '#1e293b' }}>
+                        📋 Xác Nhận Nộp Bài Thi
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p style={{ color: '#475569', fontSize: '1rem', marginBottom: '16px' }}>
+                        Bạn có chắc chắn muốn nộp bài thi ngay bây giờ? Sau khi nộp, bạn sẽ không thể thay đổi đáp án.
+                    </p>
+
+                    <div style={{
+                        backgroundColor: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '10px',
+                        padding: '16px',
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(2, 1fr)',
+                        gap: '12px',
+                        marginBottom: '16px'
+                    }}>
+                        <div>
+                            <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Đã hoàn thành:</span>
+                            <div style={{ fontWeight: 800, fontSize: '1.15rem', color: '#16a34a' }}>
+                                {answeredCount} / {dataQuiz.length} câu
+                            </div>
+                        </div>
+                        <div>
+                            <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Chưa trả lời:</span>
+                            <div style={{ fontWeight: 800, fontSize: '1.15rem', color: unansweredCount > 0 ? '#ea580c' : '#16a34a' }}>
+                                {unansweredCount} câu
+                            </div>
+                        </div>
+                        <div>
+                            <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Đã cắm cờ xem lại:</span>
+                            <div style={{ fontWeight: 800, fontSize: '1.15rem', color: '#d97706' }}>
+                                {flaggedQuestions.length} câu
+                            </div>
+                        </div>
+                        <div>
+                            <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Thời gian còn lại:</span>
+                            <div style={{ fontWeight: 800, fontSize: '1.15rem', color: '#2563eb' }}>
+                                {formattedTime}
+                            </div>
+                        </div>
+                    </div>
+
+                    {unansweredCount > 0 && (
+                        <div style={{
+                            backgroundColor: '#fffbeb',
+                            border: '1px solid #fde68a',
+                            borderRadius: '8px',
+                            padding: '10px 14px',
+                            color: '#92400e',
+                            fontSize: '0.9rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                        }}>
+                            <span>⚠️</span>
+                            <span>Bạn vẫn còn <strong>{unansweredCount} câu chưa chọn đáp án</strong>!</span>
+                        </div>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        type="button"
+                        className="btn btn-outline-secondary px-3 py-2 fw-semibold"
+                        onClick={() => setShowConfirmSubmitModal(false)}
+                    >
+                        Tiếp tục làm bài
+                    </button>
+                    <button
+                        type="button"
+                        className="btn btn-primary px-4 py-2 fw-bold"
+                        onClick={handleFinishSubmit}
+                    >
+                        Xác nhận nộp bài ✓
+                    </button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Tab Switch Warning Modal */}
+            <Modal
+                show={showTabSwitchWarning}
+                onHide={() => setShowTabSwitchWarning(false)}
+                centered
+            >
+                <Modal.Header closeButton style={{ backgroundColor: '#fff7ed', borderBottom: '1px solid #fed7aa' }}>
+                    <Modal.Title style={{ color: '#c2410c', fontWeight: 800, fontSize: '1.15rem' }}>
+                        ⚠️ Cảnh Báo An Toàn Thi Cử
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p style={{ color: '#334155', fontSize: '0.95rem', lineHeight: '1.5' }}>
+                        {tabWarningMessage}
+                    </p>
+                    <div style={{
+                        padding: '10px 14px',
+                        backgroundColor: '#fef2f2',
+                        border: '1px solid #fecaca',
+                        borderRadius: '8px',
+                        color: '#b91c1c',
+                        fontSize: '0.88rem'
+                    }}>
+                        🚨 <strong>Quy chế:</strong> Nếu thí sinh rời khỏi giao diện thi quá 3 lần, hệ thống sẽ tự động khóa bài và nộp điểm số tại thời điểm vi phạm.
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        type="button"
+                        className="btn btn-warning px-4 py-2 fw-bold"
+                        onClick={() => setShowTabSwitchWarning(false)}
+                    >
+                        Tôi đã hiểu &amp; Cam kết tiếp tục làm bài
+                    </button>
+                </Modal.Footer>
+            </Modal>
 
             {/* Modal Result */}
             <ModalResult
                 show={isShowModalResult}
                 setShow={setIsShowModalResult}
                 dataModalResult={dataModalResult}
-                setDataModalResult={setDataModalResult}
                 dataQuiz={dataQuiz}
+                timeSpent={finalTimeSpentRef.current}
                 onEnterReviewMode={() => {
                     setIsShowModalResult(false);
                     setIsReviewMode(true);
                 }}
+                onRetry={handleRetry}
             />
         </div>
     );
 };
 
-export default Detail;
-
+export default DetailQuiz;

@@ -59,9 +59,17 @@
     /* Metrics Summary Cards */
     .metrics-summary-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
       margin-bottom: 28px;
+
+      @media (max-width: 991px) {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      @media (max-width: 576px) {
+        grid-template-columns: repeat(2, 1fr);
+      }
 
       .metric-card {
         background-color: var(--qm-slate-50);
