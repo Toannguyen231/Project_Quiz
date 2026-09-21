@@ -2,17 +2,16 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     FaPlayCircle,
-    FaLightbulb,
     FaClock,
     FaArrowLeft,
     FaStar,
-    FaRedo,
     FaTimes,
     FaCheck,
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { getTips } from '../component/sevices/apiService';
 import Skeleton from '../component/Common/Skeleton';
+import mascotImg from '../accets/quizzy-mascot.jpg';
 import './Pages.scss';
 
 const TipsNhanh = () => {
@@ -88,18 +87,18 @@ const TipsNhanh = () => {
                     </div>
                 ) : hasError ? (
                     <div className="page-empty-state">
-                        <FaRedo className="page-empty-icon" />
+                        <img src={mascotImg} alt="Quizzy Mascot" className="page-empty-mascot" />
                         <h3>Lỗi tải danh sách bí kíp</h3>
-                        <p>Không thể kết nối đến máy chủ. Vui lòng thử lại.</p>
+                        <p>Không thể kết nối đến máy chủ. Quizzy đang thử lại, bạn bấm nút bên dưới nhé!</p>
                         <button className="page-btn page-btn-primary" onClick={fetchTips}>
                             Thử lại ngay
                         </button>
                     </div>
                 ) : tips.length === 0 ? (
                     <div className="page-empty-state">
-                        <FaLightbulb className="page-empty-icon" />
+                        <img src={mascotImg} alt="Quizzy Mascot" className="page-empty-mascot" />
                         <h3>Không tìm thấy nội dung phù hợp</h3>
-                        <p>Chưa có video mẹo nào trong danh mục này. Hãy thử chọn danh mục khác nhé!</p>
+                        <p>Chưa có video mẹo nào trong danh mục này. Hãy cùng Quizzy khám phá các danh mục khác nhé!</p>
                     </div>
                 ) : (
                     <div className="tips-grid">
@@ -120,7 +119,7 @@ const TipsNhanh = () => {
                                     <h3>{tip.title}</h3>
                                     <p>{tip.description}</p>
                                     <button
-                                        type="button"
+                                         type="button"
                                         className="page-btn page-btn-primary page-btn-sm"
                                         onClick={() => setActiveVideo(tip)}
                                     >
@@ -133,7 +132,7 @@ const TipsNhanh = () => {
                 )}
 
                 <div className="page-empty-state">
-                    <FaLightbulb className="page-empty-icon" />
+                    <img src={mascotImg} alt="Quizzy Mascot" className="page-empty-mascot" />
                     <h3>Sắp có thêm video mới</h3>
                     <p>Đội ngũ NNT đang sản xuất thêm loạt video mẹo ôn thi cho TOEIC, VSTEP và lập trình. Quay lại sau nhé!</p>
                     <button className="page-btn page-btn-ghost" onClick={() => navigate('/')}>

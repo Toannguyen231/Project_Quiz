@@ -4,17 +4,16 @@ import { useSelector } from 'react-redux';
 import {
     FaUsers,
     FaChalkboardTeacher,
-    FaUserPlus,
     FaArrowLeft,
     FaCheckCircle,
     FaClock,
     FaBookOpen,
     FaGraduationCap,
-    FaRedo,
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { getClasses, joinClass, getMyClasses } from '../component/sevices/apiService';
 import Skeleton from '../component/Common/Skeleton';
+import mascotImg from '../accets/quizzy-mascot.jpg';
 import './Pages.scss';
 
 const Classes = () => {
@@ -171,18 +170,18 @@ const Classes = () => {
                     </div>
                 ) : hasError ? (
                     <div className="page-empty-state">
-                        <FaRedo className="page-empty-icon" />
+                        <img src={mascotImg} alt="Quizzy Mascot" className="page-empty-mascot" />
                         <h3>Lỗi tải dữ liệu lớp học</h3>
-                        <p>Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.</p>
+                        <p>Không thể kết nối đến máy chủ. Đừng lo lắng, Quizzy đang hỗ trợ thử lại!</p>
                         <button className="page-btn page-btn-primary" onClick={fetchData}>
                             Thử lại ngay
                         </button>
                     </div>
                 ) : classes.length === 0 ? (
                     <div className="page-empty-state">
-                        <FaUsers className="page-empty-icon" />
+                        <img src={mascotImg} alt="Quizzy Mascot" className="page-empty-mascot" />
                         <h3>Chưa có lớp học nào mở</h3>
-                        <p>Hiện tại chưa có lớp học nào được mở. Vui lòng quay lại sau nhé!</p>
+                        <p>Hiện tại chưa có lớp học nào được mở. Quizzy đang chuẩn bị thêm nhiều lớp mới, quay lại sau nhé!</p>
                     </div>
                 ) : (
                     <div className="classes-grid">
@@ -223,7 +222,7 @@ const Classes = () => {
                 )}
 
                 <div className="page-empty-state">
-                    <FaUserPlus className="page-empty-icon" />
+                    <img src={mascotImg} alt="Quizzy Mascot" className="page-empty-mascot" />
                     <h3>Muốn mở lớp học riêng?</h3>
                     <p>Tính năng tạo lớp cho giáo viên sẽ ra mắt ở phiên bản kế tiếp. Hiện tại bạn có thể tham gia các lớp đang mở bên trên.</p>
                     <button className="page-btn page-btn-ghost" onClick={() => navigate('/')}>

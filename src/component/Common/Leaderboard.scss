@@ -96,7 +96,7 @@
       }
 
       &.top-1-item {
-        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        background: #fffbeb;
         border-color: #fcd34d;
         box-shadow: 0 4px 14px rgba(245, 158, 11, 0.12);
 
@@ -166,7 +166,7 @@
             border-radius: var(--qm-radius-full);
             font-size: 0.76rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            background: #eff6ff;
             color: #1d4ed8;
             border: 1px solid #bfdbfe;
           }

@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-    FaNewspaper,
     FaArrowLeft,
     FaTag,
     FaCalendarAlt,
     FaBookOpen,
     FaRegCommentDots,
-    FaRedo,
     FaTimes,
     FaShareAlt,
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { getPosts, getPostDetail } from '../component/sevices/apiService';
 import Skeleton from '../component/Common/Skeleton';
+import mascotImg from '../accets/quizzy-mascot.jpg';
 import './Pages.scss';
 
 const Blog = () => {
@@ -118,18 +117,18 @@ const Blog = () => {
                     </div>
                 ) : hasError ? (
                     <div className="page-empty-state">
-                        <FaRedo className="page-empty-icon" />
+                        <img src={mascotImg} alt="Quizzy Mascot" className="page-empty-mascot" />
                         <h3>Lỗi tải danh sách bài viết</h3>
-                        <p>Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại đường truyền.</p>
+                        <p>Không thể kết nối đến máy chủ. Quizzy đang tải lại, bạn bấm nút bên dưới nhé!</p>
                         <button className="page-btn page-btn-primary" onClick={fetchPosts}>
                             Thử lại ngay
                         </button>
                     </div>
                 ) : posts.length === 0 ? (
                     <div className="page-empty-state">
-                        <FaNewspaper className="page-empty-icon" />
+                        <img src={mascotImg} alt="Quizzy Mascot" className="page-empty-mascot" />
                         <h3>Chưa có bài viết trong chuyên mục này</h3>
-                        <p>Chúng tôi đang cập nhật thêm nội dung. Bạn hãy chọn chuyên mục khác nhé!</p>
+                        <p>Quizzy đang cùng các thầy cô hoàn thiện nội dung. Bạn hãy chọn chuyên mục khác nhé!</p>
                     </div>
                 ) : (
                     <div className="blog-grid">
@@ -159,7 +158,7 @@ const Blog = () => {
                 )}
 
                 <div className="page-empty-state">
-                    <FaNewspaper className="page-empty-icon" />
+                    <img src={mascotImg} alt="Quizzy Mascot" className="page-empty-mascot" />
                     <h3>Đang cập nhật bài viết mới</h3>
                     <p>Đội ngũ NNT đang soạn thêm bài viết. Quay lại mỗi tuần để đọc tin mới nhất nhé!</p>
                     <button className="page-btn page-btn-ghost" onClick={() => navigate('/')}>
