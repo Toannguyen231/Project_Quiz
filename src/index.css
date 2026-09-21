@@ -4,56 +4,57 @@
 
 :root {
   /* Brand Colors */
-  --qm-primary: #2563eb;
-  --qm-primary-hover: #1d4ed8;
-  --qm-primary-light: #eff6ff;
-  --qm-primary-border: #bfdbfe;
+  --qm-primary: #6366F1;
+  --qm-primary-hover: #4F46E5;
+  --qm-primary-light: #EEF2FF;
+  --qm-primary-border: #C7D2FE;
 
-  --qm-secondary: #7c3aed;
-  --qm-secondary-hover: #6d28d9;
-  --qm-secondary-light: #f5f3ff;
+  --qm-secondary: #7C3AED;
+  --qm-secondary-hover: #6D28D9;
+  --qm-secondary-light: #F5F3FF;
 
-  --qm-accent: #f59e0b;
-  --qm-accent-hover: #d97706;
-  --qm-accent-light: #fffbeb;
+  --qm-accent: #FF7A2A;
+  --qm-accent-hover: #EA580C;
+  --qm-accent-light: #FFF7ED;
+  --qm-accent-gold: #FFBB35;
 
-  --qm-success: #10b981;
+  --qm-success: #10B981;
   --qm-success-hover: #059669;
-  --qm-success-light: #ecfdf5;
+  --qm-success-light: #ECFDF5;
 
-  --qm-danger: #ef4444;
-  --qm-danger-hover: #dc2626;
-  --qm-danger-light: #fef2f2;
+  --qm-danger: #EF4444;
+  --qm-danger-hover: #DC2626;
+  --qm-danger-light: #FEF2F2;
 
-  /* TPP-Style Vibrant Gradients */
-  --nnt-gradient-primary: linear-gradient(135deg, #6C63FF 0%, #FF9963 100%);
+  /* Standard Gradients (chỉ 2 chuẩn, dùng có chủ đích) */
+  --nnt-gradient-primary: linear-gradient(135deg, #6366F1 0%, #FF7A2A 100%);
   --nnt-gradient-gold: linear-gradient(135deg, #FFBB35 0%, #FFB380 100%);
-  --nnt-gradient-button: linear-gradient(135deg, #6C63FF 0%, #FF9963 100%);
+  --nnt-gradient-button: linear-gradient(135deg, #6366F1 0%, #FF7A2A 100%);
   --nnt-gold-border: #FFDD63;
 
   /* Neutrals */
-  --qm-slate-900: #0f172a;
-  --qm-slate-800: #1e293b;
+  --qm-slate-900: #0F172A;
+  --qm-slate-800: #1E293B;
   --qm-slate-700: #334155;
   --qm-slate-600: #475569;
-  --qm-slate-500: #64748b;
-  --qm-slate-400: #94a3b8;
-  --qm-slate-300: #cbd5e1;
-  --qm-slate-200: #e2e8f0;
-  --qm-slate-100: #f1f5f9;
-  --qm-slate-50: #f8fafc;
-  --qm-white: #ffffff;
+  --qm-slate-500: #64748B;
+  --qm-slate-400: #94A3B8;
+  --qm-slate-300: #CBD5E1;
+  --qm-slate-200: #E2E8F0;
+  --qm-slate-100: #F1F5F9;
+  --qm-slate-50: #F8FAFC;
+  --qm-white: #FFFFFF;
 
   /* Typography */
   --qm-font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --qm-font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Shadows */
-  --qm-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --qm-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08), 0 1px 2px -1px rgba(0, 0, 0, 0.08);
-  --qm-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.08);
-  --qm-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
-  --qm-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+  /* Shadows (1 lớp mỏng, tránh chồng lớp) */
+  --qm-shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --qm-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.06);
+  --qm-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
+  --qm-shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.06);
+  --qm-shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.06);
 
   /* Border Radii */
   --qm-radius-sm: 6px;
@@ -68,10 +69,50 @@
   --qm-transition-smooth: 350ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Dark Mode Tokens (chuẩn tông #0F172A / #1E293B / #334155 / #E2E8F0) */
+[data-theme="dark"],
+body[data-theme="dark"],
+.dark {
+  --qm-bg: #0F172A;
+  --qm-surface: #1E293B;
+  --qm-card-bg: #1E293B;
+  --qm-border: #334155;
+  --qm-text: #E2E8F0;
+  --qm-text-muted: #94A3B8;
+
+  --qm-slate-900: #F8FAFC;
+  --qm-slate-800: #E2E8F0;
+  --qm-slate-700: #CBD5E1;
+  --qm-slate-600: #94A3B8;
+  --qm-slate-500: #64748B;
+  --qm-slate-400: #475569;
+  --qm-slate-300: #334155;
+  --qm-slate-200: #1E293B;
+  --qm-slate-100: #0F172A;
+  --qm-slate-50: #0B1120;
+  --qm-white: #1E293B;
+
+  --qm-primary-light: rgba(99, 102, 241, 0.15);
+  --qm-primary-border: #4F46E5;
+  --qm-accent-light: rgba(255, 122, 42, 0.15);
+  --qm-success-light: rgba(16, 185, 129, 0.15);
+}
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 body {
@@ -87,6 +128,12 @@ body {
   overflow-x: hidden;
 }
 
+[data-theme="dark"] body,
+body[data-theme="dark"] {
+  background-color: #0F172A;
+  color: #E2E8F0;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--qm-font-heading);
   color: var(--qm-slate-900);
@@ -99,9 +146,9 @@ code {
   font-family: 'Fira Code', source-code-pro, Menlo, Monaco, Consolas, monospace;
 }
 
-/* TPP Gradient Text Utility Classes */
+/* Gradient Text Utility Classes (chuẩn 2 màu) */
 .text-gradient-purple-orange {
-  background: linear-gradient(135deg, #6C63FF 0%, #FF9963 100%);
+  background: linear-gradient(135deg, #6366F1 0%, #FF7A2A 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
