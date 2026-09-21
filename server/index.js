@@ -25,6 +25,14 @@ app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// URL normalization for double prefix (/api/v1/api/v1/* -> /api/v1/*)
+app.use((req, res, next) => {
+    if (req.url.startsWith('/api/v1/api/v1')) {
+        req.url = req.url.replace('/api/v1/api/v1', '/api/v1');
+    }
+    next();
+});
+
 // Healthcheck endpoint
 app.get('/api/v1/health', (req, res) => {
     res.status(200).json({
@@ -52,11 +60,11 @@ app.use('/api/v1', statsRoutes);
 const buildPath = path.resolve(__dirname, '../build');
 if (fs.existsSync(buildPath)) {
     app.use(express.static(buildPath));
-    app.get('*', (req, res, next) => {
-        if (req.path.startsWith('/api/')) {
-            return next();
+    app.use((req, res, next) => {
+        if (req.method === 'GET' && !req.path.startsWith('/api/')) {
+            return res.sendFile(path.join(buildPath, 'index.html'));
         }
-        res.sendFile(path.join(buildPath, 'index.html'));
+        next();
     });
 }
 

@@ -34,6 +34,9 @@ const processQueue = (error, token = null) => {
 // Request Interceptor: Attach Bearer token from Redux store & start NProgress
 instance.interceptors.request.use(
     function (config) {
+        if (config.url && config.url.startsWith('/api/v1')) {
+            config.url = config.url.replace(/^\/api\/v1/, '') || '/';
+        }
         const state = store.getState();
         const token = state?.user?.account?.access_token || state?.user?.account?.token;
 

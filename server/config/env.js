@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const serverEnvPath = path.resolve(__dirname, '../.env');
 dotenv.config({ path: serverEnvPath });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || 'quizmaster_secret_jwt_key_2026_phase0';
 const DB_PATH = process.env.DB_PATH || path.resolve(__dirname, '../data/quizmaster.db');
 

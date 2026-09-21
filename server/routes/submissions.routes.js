@@ -34,10 +34,11 @@ router.post('/quiz-submit', optionalAuth, (req, res) => {
     if (Array.isArray(answers)) {
         for (const item of answers) {
             const qId = item.questionId || item.id;
-            const userAns = Array.isArray(item.userAnswer)
-                ? item.userAnswer.map(Number)
-                : item.userAnswer !== undefined && item.userAnswer !== null
-                ? [Number(item.userAnswer)]
+            const rawAns = item.userAnswerId !== undefined ? item.userAnswerId : item.userAnswer;
+            const userAns = Array.isArray(rawAns)
+                ? rawAns.map(Number)
+                : rawAns !== undefined && rawAns !== null
+                ? [Number(rawAns)]
                 : [];
             userAnswersMap.set(Number(qId), userAns);
         }

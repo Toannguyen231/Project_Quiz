@@ -103,7 +103,7 @@ const putUpdateUser = async (id, username, role, image) => {
     data.append('username', username);
     data.append('role', role);
     data.append('userImage', image);
-    return await instance.put('/api/v1/participant', data);
+    return await instance.put('/participant', data);
   } catch (error) {
     if (isNetworkError(error)) {
       return mockUpdateUser(id, username, role, image);
@@ -114,7 +114,7 @@ const putUpdateUser = async (id, username, role, image) => {
 
 const deleteUser = async (userID) => {
   try {
-    return await instance.delete('/api/v1/participant', { data: { id: userID } });
+    return await instance.delete('/participant', { data: { id: userID } });
   } catch (error) {
     if (isNetworkError(error)) {
       return mockDeleteUserService(userID);
@@ -125,7 +125,7 @@ const deleteUser = async (userID) => {
 
 const getPageUserWithPage = async (page, limit) => {
   try {
-    return await instance.get(`/api/v1/participant?page=${page}&limit=${limit}`);
+    return await instance.get(`/participant?page=${page}&limit=${limit}`);
   } catch (error) {
     if (isNetworkError(error)) {
       return mockGetUsersWithPage(page, limit);
@@ -137,7 +137,7 @@ const getPageUserWithPage = async (page, limit) => {
 // ── QUIZ ────────────────────────────────────────────────────
 const getQuzizeByPage = async () => {
   try {
-    return await instance.get('/api/v1/quiz-by-participant');
+    return await instance.get('/quiz-by-participant');
   } catch (error) {
     if (isNetworkError(error)) {
       return mockGetQuizzesByParticipant();
@@ -148,7 +148,7 @@ const getQuzizeByPage = async () => {
 
 const getAllQuizForAdmin = async () => {
   try {
-    return await instance.get('/api/v1/quiz/all');
+    return await instance.get('/quiz/all');
   } catch (error) {
     if (isNetworkError(error)) {
       return mockGetAllQuizForAdmin();
@@ -164,7 +164,7 @@ const postCreateQuiz = async (description, name, difficulty, image) => {
     formData.append('name', name);
     formData.append('difficulty', difficulty);
     formData.append('quizImage', image);
-    return await instance.post('/api/v1/quiz', formData);
+    return await instance.post('/quiz', formData);
   } catch (error) {
     if (isNetworkError(error)) {
       return mockCreateQuiz(name, description, difficulty, image);
@@ -181,7 +181,7 @@ const putUpdateQuiz = async (id, description, name, difficulty, image) => {
     formData.append('name', name);
     formData.append('difficulty', difficulty);
     formData.append('quizImage', image);
-    return await instance.put('/api/v1/quiz', formData);
+    return await instance.put('/quiz', formData);
   } catch (error) {
     if (isNetworkError(error)) {
       return mockUpdateQuiz(id, name, description, difficulty, image);
@@ -192,7 +192,7 @@ const putUpdateQuiz = async (id, description, name, difficulty, image) => {
 
 const deleteQuiz = async (quizID) => {
   try {
-    return await instance.delete(`/api/v1/quiz/${quizID}`);
+    return await instance.delete(`/quiz/${quizID}`);
   } catch (error) {
     if (isNetworkError(error)) {
       return mockDeleteQuizService(quizID);
@@ -204,7 +204,7 @@ const deleteQuiz = async (quizID) => {
 // ── QUESTIONS ───────────────────────────────────────────────
 const getQuestionsByQuizId = async (id) => {
   try {
-    return await instance.get(`/api/v1/questions-by-quiz?quizId=${id}`);
+    return await instance.get(`/questions-by-quiz?quizId=${id}`);
   } catch (error) {
     if (isNetworkError(error)) {
       return mockGetQuestionsByQuizId(id);
@@ -215,7 +215,7 @@ const getQuestionsByQuizId = async (id) => {
 
 const postSubmitQuiz = async (data) => {
   try {
-    return await instance.post('/api/v1/quiz-submit', { ...data });
+    return await instance.post('/quiz-submit', { ...data });
   } catch (error) {
     if (isNetworkError(error)) {
       return mockSubmitQuiz(data.quizId, data.answers);
@@ -227,7 +227,7 @@ const postSubmitQuiz = async (data) => {
 // ── NEW: Save questions for quiz (Admin Question Builder) ───
 const postSaveQuestionsForQuiz = async (quizId, questionsList) => {
   try {
-    return await instance.post('/api/v1/quiz-assign-to-quiz', { quizId, questions: questionsList });
+    return await instance.post('/quiz-assign-to-quiz', { quizId, questions: questionsList });
   } catch (error) {
     if (isNetworkError(error)) {
       return mockSaveQuestionsForQuiz(quizId, questionsList);
@@ -239,7 +239,7 @@ const postSaveQuestionsForQuiz = async (quizId, questionsList) => {
 // ── NEW: Dashboard overview (Admin) ─────────────────────────
 const getOverview = async () => {
   try {
-    return await instance.get('/api/v1/overview');
+    return await instance.get('/overview');
   } catch (error) {
     if (isNetworkError(error)) {
       return mockGetOverview();

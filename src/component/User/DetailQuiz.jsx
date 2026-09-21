@@ -131,10 +131,19 @@ const DetailQuiz = () => {
                                 type = item.type || "SINGLE";
                             }
                             if (item.answers) {
-                                answers.push({
-                                    ...item.answers,
-                                    isSelected: false
-                                });
+                                if (Array.isArray(item.answers)) {
+                                    item.answers.forEach((ans) => {
+                                        answers.push({
+                                            ...ans,
+                                            isSelected: false,
+                                        });
+                                    });
+                                } else {
+                                    answers.push({
+                                        ...item.answers,
+                                        isSelected: false
+                                    });
+                                }
                             }
                         });
                         return {
@@ -333,8 +342,8 @@ const DetailQuiz = () => {
             const next = _.cloneDeep(prev);
             const targetQ = next.find((q) => +q.questionId === +questionId);
             if (targetQ && targetQ.answers) {
-                // If single-choice, deselect other answers
-                if (targetQ.type === 'SINGLE') {
+                // If single-choice (SINGLE or TRUE_FALSE), deselect other answers
+                if (targetQ.type === 'SINGLE' || targetQ.type === 'TRUE_FALSE' || !targetQ.type) {
                     targetQ.answers.forEach((a) => {
                         if (+a.id === +answerId) {
                             a.isSelected = !a.isSelected;

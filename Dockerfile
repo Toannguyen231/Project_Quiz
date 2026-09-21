@@ -15,7 +15,7 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 ENV NODE_ENV=production
-ENV PORT=3001
+ENV PORT=5000
 ENV DB_PATH=/app/server/data/quizmaster.db
 
 # Dependencies needed for better-sqlite3 native build on alpine
@@ -30,6 +30,6 @@ COPY --from=builder /app/build ./build
 # Ensure SQLite storage directory exists
 RUN mkdir -p /app/server/data
 
-EXPOSE 3001
+EXPOSE 5000
 
 CMD ["node", "server/index.js"]
