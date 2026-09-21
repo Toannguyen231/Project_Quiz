@@ -7,6 +7,7 @@ import { postLogin } from '../../sevices/apiService';
 import instance from '../../util/axiosCutomes';
 import { useDispatch, useSelector } from 'react-redux';
 import { ImSpinner6 } from 'react-icons/im';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { FETCH_USER_LOGIN_SUCCESS } from '../../actions/Actions';
 
 function Login() {
@@ -209,146 +210,104 @@ function Login() {
 
                         <div className="login-buttons">
                             {/* Demo Login Quick Buttons */}
-                            <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
+                            <div className="demo-buttons-group">
                                 <button
                                     type="button"
-                                    style={{
-                                        flex: 1,
-                                        padding: '12px',
-                                        borderRadius: '10px',
-                                        border: '2px solid #22c55e',
-                                        backgroundColor: '#f0fdf4',
-                                        color: '#15803d',
-                                        fontWeight: '600',
-                                        cursor: isLoading ? 'not-allowed' : 'pointer',
-                                        transition: 'all 0.2s',
-                                        fontSize: '0.9rem',
-                                        opacity: isLoading ? 0.6 : 1,
-                                    }}
+                                    className="btn-demo btn-demo-user"
                                     onClick={() => handleDemoLogin('user')}
                                     disabled={isLoading}
-                                    onMouseOver={(e) => {
-                                        if (!isLoading) e.currentTarget.style.backgroundColor = '#dcfce7';
-                                    }}
-                                    onMouseOut={(e) => {
-                                        if (!isLoading) e.currentTarget.style.backgroundColor = '#f0fdf4';
-                                    }}
                                 >
-                                    🟢 Demo Thí sinh
+                                    <span className="demo-dot green"></span>
+                                    <span>Demo Thí sinh</span>
                                 </button>
                                 <button
                                     type="button"
-                                    style={{
-                                        flex: 1,
-                                        padding: '12px',
-                                        borderRadius: '10px',
-                                        border: '2px solid #8b5cf6',
-                                        backgroundColor: '#f5f3ff',
-                                        color: '#6d28d9',
-                                        fontWeight: '600',
-                                        cursor: isLoading ? 'not-allowed' : 'pointer',
-                                        transition: 'all 0.2s',
-                                        fontSize: '0.9rem',
-                                        opacity: isLoading ? 0.6 : 1,
-                                    }}
+                                    className="btn-demo btn-demo-admin"
                                     onClick={() => handleDemoLogin('admin')}
                                     disabled={isLoading}
-                                    onMouseOver={(e) => {
-                                        if (!isLoading) e.currentTarget.style.backgroundColor = '#ede9fe';
-                                    }}
-                                    onMouseOut={(e) => {
-                                        if (!isLoading) e.currentTarget.style.backgroundColor = '#f5f3ff';
-                                    }}
                                 >
-                                    🟣 Demo Admin
+                                    <span className="demo-dot purple"></span>
+                                    <span>Demo Admin</span>
                                 </button>
                             </div>
 
-                            <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem', margin: '8px 0' }}>
-                                — hoặc đăng nhập bằng tài khoản —
+                            <div className="login-divider">
+                                <span>— hoặc đăng nhập bằng tài khoản —</span>
                             </div>
 
-                            <div className="login-input-group">
-                                <input
-                                    type="email"
-                                    placeholder="Email"
-                                    className="input-email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    disabled={isLoading}
-                                    autoComplete="email"
-                                />
-                                <div style={{ position: 'relative', width: '100%' }}>
-                                    <input
-                                        type={showPassword ? 'text' : 'password'}
-                                        placeholder="Mật khẩu (tối thiểu 6 ký tự)"
-                                        className="input-password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === 'Enter') handleSubmitLogin();
-                                        }}
-                                        disabled={isLoading}
-                                        autoComplete="current-password"
-                                        style={{ width: '100%', paddingRight: '45px' }}
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        tabIndex={-1}
-                                        style={{
-                                            position: 'absolute',
-                                            right: '12px',
-                                            top: '50%',
-                                            transform: 'translateY(-50%)',
-                                            background: 'none',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            color: '#64748b',
-                                            fontSize: '0.85rem',
-                                            padding: '4px',
-                                        }}
-                                        aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                                    >
-                                        {showPassword ? 'Ẩn' : 'Hiện'}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '-4px', marginBottom: '8px' }}>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowForgotModal(true)}
-                                    style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        color: '#3b82f6',
-                                        fontSize: '0.85rem',
-                                        cursor: 'pointer',
-                                        padding: 0,
-                                        textDecoration: 'underline',
-                                    }}
-                                >
-                                    Quên mật khẩu?
-                                </button>
-                            </div>
-
-                            <button
-                                className="btn-email"
-                                onClick={() => handleSubmitLogin()}
-                                disabled={isLoading}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '8px',
-                                    cursor: isLoading ? 'not-allowed' : 'pointer',
-                                    opacity: isLoading ? 0.7 : 1,
+                            <form
+                                className="login-inputs-form"
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleSubmitLogin();
                                 }}
                             >
-                                {isLoading && <ImSpinner6 className="loaderIcon" style={{ animation: 'spin 1s linear infinite' }} />}
-                                <span>{isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}</span>
-                            </button>
+                                <div className="form-field-group">
+                                    <label className="field-label" htmlFor="login-email">
+                                        Email
+                                    </label>
+                                    <div className="field-input-wrapper">
+                                        <FaEnvelope className="field-icon" />
+                                        <input
+                                            id="login-email"
+                                            type="email"
+                                            placeholder="name@example.com"
+                                            className="input-field input-email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            disabled={isLoading}
+                                            autoComplete="email"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-field-group">
+                                    <div className="field-label-row">
+                                        <label className="field-label" htmlFor="login-password">
+                                            Mật khẩu
+                                        </label>
+                                        <button
+                                            type="button"
+                                            className="btn-forgot-password"
+                                            onClick={() => setShowForgotModal(true)}
+                                            tabIndex={-1}
+                                        >
+                                            Quên mật khẩu?
+                                        </button>
+                                    </div>
+                                    <div className="field-input-wrapper">
+                                        <FaLock className="field-icon" />
+                                        <input
+                                            id="login-password"
+                                            type={showPassword ? 'text' : 'password'}
+                                            placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                                            className="input-field input-password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            disabled={isLoading}
+                                            autoComplete="current-password"
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn-toggle-password"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            tabIndex={-1}
+                                            aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                                        >
+                                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="btn-submit-login btn-email"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading && <ImSpinner6 className="loaderIcon" style={{ animation: 'spin 1s linear infinite' }} />}
+                                    <span>{isLoading ? 'Đang đăng nhập...' : 'Đăng nhập'}</span>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
