@@ -446,7 +446,7 @@ const Home = () => {
                 <div className="courses-grid">
                     {filteredCourses.map(course => (
                         <div key={course.id} className="course-card">
-                            <div className="course-card-banner" style={{ background: 'linear-gradient(135deg, #ede9fe 0%, #ffedd5 100%)' }}>
+                            <div className="course-card-banner">
                                 {course.icon}
                             </div>
                             <div className="course-card-content">
