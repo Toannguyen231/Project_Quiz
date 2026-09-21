@@ -117,27 +117,24 @@ const Header = () => {
                         >
                             Khoá Học
                         </a>
-                        <button 
-                            type="button" 
-                            className="nav-link-tpp btn-nav-plain"
-                            onClick={() => alert("Tính năng Lớp Học Trực Tuyến đang được hoàn thiện và sẽ sớm ra mắt trong phiên bản tới!")}
+                        <NavLink 
+                            to="/lop-hoc" 
+                            className={({ isActive }) => `nav-link-tpp ${isActive ? 'active' : ''}`}
                         >
                             Lớp học
-                        </button>
-                        <button 
-                            type="button" 
-                            className="nav-link-tpp btn-nav-plain"
-                            onClick={() => alert("Tính năng Tips Nhanh — Video & Bí Kíp Ôn Thi NNT đang được hoàn thiện và sẽ sớm ra mắt!")}
+                        </NavLink>
+                        <NavLink 
+                            to="/tips-nhanh" 
+                            className={({ isActive }) => `nav-link-tpp ${isActive ? 'active' : ''}`}
                         >
                             Tips Nhanh
-                        </button>
-                        <button 
-                            type="button" 
-                            className="nav-link-tpp btn-nav-plain"
-                            onClick={() => alert("Chuyên mục Blog Tin Tức & Kinh Nghiệm Thi đang được cập nhật bài viết mới!")}
+                        </NavLink>
+                        <NavLink 
+                            to="/blog" 
+                            className={({ isActive }) => `nav-link-tpp ${isActive ? 'active' : ''}`}
                         >
                             Blog
-                        </button>
+                        </NavLink>
                         {isAuthenticated && isAdmin && (
                             <NavLink 
                                 to="/admin" 

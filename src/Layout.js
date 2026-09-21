@@ -15,6 +15,9 @@ import Detail from './component/User/DetailQuiz';
 import ManageQuiz from './component/Admin/Content/Quiz/ManageQuiz.jsx';
 import Questions from './component/Admin/Content/Question/Questions.jsx';
 import MascotCompanion from './component/Common/MascotCompanion';
+import Classes from './pages/Classes';
+import TipsNhanh from './pages/TipsNhanh';
+import Blog from './pages/Blog';
 
 const NotFound = () => {
     return (
@@ -36,6 +39,9 @@ const Layout = () => {
                 <Route path="/" element={<App />}>
                     <Route index element={<Home />} />
                     <Route path="user" element={<ListQuiz />} />
+                    <Route path="lop-hoc" element={<Classes />} />
+                    <Route path="tips-nhanh" element={<TipsNhanh />} />
+                    <Route path="blog" element={<Blog />} />
                 </Route>
                 <Route path="/quiz/:id" element={<Detail />} />
                 <Route path="admin" element={<Admin />}>
