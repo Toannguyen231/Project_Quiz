@@ -314,15 +314,15 @@
   .quizzy-wrong-callout {
     margin-top: 24px;
     padding: 16px 20px;
-    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    background-color: var(--qm-accent-light);
     border: 1.5px solid #fed7aa;
-    border-left: 5px solid #f97316;
+    border-left: 5px solid var(--qm-accent);
     border-radius: var(--qm-radius-lg);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    box-shadow: 0 4px 16px rgba(249, 115, 22, 0.1);
+    box-shadow: 0 2px 10px rgba(255, 122, 42, 0.08);
     animation: fadeInExp 0.35s ease-out;
 
     @media (max-width: 768px) {
@@ -369,16 +369,16 @@
       align-items: center;
       gap: 8px;
       padding: 10px 20px;
-      background: linear-gradient(135deg, #ff7a00 0%, #ea580c 100%);
+      background-color: var(--qm-accent);
       color: #ffffff;
       border: none;
-      border-radius: var(--qm-radius-full);
+      border-radius: var(--qm-radius-md);
       font-family: var(--qm-font-heading);
       font-size: 0.9rem;
       font-weight: 700;
       white-space: nowrap;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+      box-shadow: 0 4px 14px rgba(255, 122, 42, 0.3);
       transition: all var(--qm-transition-fast);
       flex-shrink: 0;
 
@@ -392,9 +392,9 @@
       }
 
       &:hover {
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 6px 20px rgba(234, 88, 12, 0.45);
-        filter: brightness(1.05);
+        background-color: var(--qm-accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 122, 42, 0.4);
       }
 
       &:active {
@@ -412,11 +412,11 @@
   .question-explanation-box {
     margin-top: 20px;
     padding: 20px 24px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background-color: #f8fafc;
     border: 1.5px solid #e2e8f0;
     border-left: 5px solid #10b981;
     border-radius: var(--qm-radius-lg);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     animation: fadeInExp 0.3s ease-out;
 
     .exp-header {

@@ -235,15 +235,15 @@
           font-weight: 700;
           font-size: 0.95rem;
           color: #ffffff;
-          background: linear-gradient(135deg, var(--qm-primary) 0%, var(--qm-primary-hover) 100%);
+          background: linear-gradient(135deg, #6366F1 0%, #FF7A2A 100%);
           border: none;
           border-radius: var(--qm-radius-md);
-          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+          box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
           transition: all var(--qm-transition-fast);
 
           &:hover {
-            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
-            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
+            transform: translateY(-2px);
           }
         }
       }
@@ -338,6 +338,89 @@
         height: 42px;
         border-radius: var(--qm-radius-md);
         margin-top: 10px;
+      }
+    }
+  }
+
+  /* Dark Mode Overrides */
+  [data-theme='dark'] &,
+  body[data-theme='dark'] & {
+    .header-title {
+      color: var(--qm-slate-100);
+    }
+    .header-subtitle {
+      color: var(--qm-slate-400);
+    }
+    .quiz-filter-bar {
+      background-color: var(--qm-slate-800);
+      border-color: var(--qm-slate-700);
+
+      .search-input {
+        background-color: var(--qm-slate-900);
+        border-color: var(--qm-slate-700);
+        color: var(--qm-slate-100);
+      }
+
+      .filter-pills .pill-btn {
+        background-color: var(--qm-slate-900);
+        border-color: var(--qm-slate-700);
+        color: var(--qm-slate-300);
+
+        &:hover {
+          background-color: var(--qm-slate-700);
+          color: #ffffff;
+        }
+
+        &.active {
+          background-color: var(--qm-primary);
+          border-color: var(--qm-primary);
+          color: #ffffff;
+        }
+      }
+    }
+
+    .quiz-card {
+      background-color: var(--qm-slate-800);
+      border-color: var(--qm-slate-700);
+
+      .card-banner {
+        opacity: 0.92;
+      }
+
+      .card-content {
+        .quiz-title {
+          color: var(--qm-slate-100);
+        }
+        .quiz-description {
+          color: var(--qm-slate-400);
+        }
+        .quiz-meta-tags .meta-tag {
+          background-color: var(--qm-slate-700);
+          color: var(--qm-slate-300);
+        }
+      }
+    }
+
+    .quiz-empty-state {
+      background-color: var(--qm-slate-800);
+      border-color: var(--qm-slate-700);
+
+      .empty-title {
+        color: var(--qm-slate-100);
+      }
+      .empty-desc {
+        color: var(--qm-slate-400);
+      }
+    }
+
+    .quiz-skeleton-card {
+      background-color: var(--qm-slate-800);
+      border-color: var(--qm-slate-700);
+
+      .skeleton-banner,
+      .skeleton-line {
+        background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+        background-size: 200% 100%;
       }
     }
   }

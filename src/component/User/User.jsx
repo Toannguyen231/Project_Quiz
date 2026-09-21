@@ -34,7 +34,8 @@ const User = () => {
         <div className="container py-4">
             {/* Candidate Profile Welcome Card */}
             <div className="card border-0 shadow-sm rounded-4 mb-4" style={{
-                background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
+                background: '#0F172A',
+                border: '1px solid #334155',
                 color: '#ffffff'
             }}>
                 <div className="card-body p-4 p-md-5">

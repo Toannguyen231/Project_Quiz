@@ -10,7 +10,7 @@
 
   &.review-mode {
     border-color: #93c5fd;
-    background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+    background-color: #f8fafc;
   }
 
   .palette-header {
@@ -40,11 +40,11 @@
     .palette-badge-count {
       font-size: 0.82rem;
       font-weight: 700;
-      color: var(--qm-primary, #2563eb);
-      background-color: #eff6ff;
+      color: var(--qm-primary, #6366F1);
+      background-color: var(--qm-primary-light);
       padding: 4px 10px;
       border-radius: var(--qm-radius-full, 9999px);
-      border: 1px solid #bfdbfe;
+      border: 1px solid var(--qm-primary-border);
     }
   }
 
@@ -111,23 +111,23 @@
 
       /* Status: Answered */
       &.status-answered {
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        border-color: #1e40af;
+        background-color: var(--qm-primary);
+        border-color: var(--qm-primary-hover);
         color: #ffffff;
-        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        box-shadow: 0 2px 4px rgba(99, 102, 241, 0.2);
 
         &:hover {
-          background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+          background-color: var(--qm-primary-hover);
           transform: translateY(-1px);
         }
       }
 
       /* Status: Correct (Review Mode) */
       &.status-correct {
-        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
-        border-color: #166534;
+        background-color: var(--qm-success);
+        border-color: var(--qm-success-hover);
         color: #ffffff;
-        box-shadow: 0 2px 4px rgba(22, 163, 74, 0.25);
+        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.25);
 
         &:hover {
           filter: brightness(1.05);
@@ -137,10 +137,10 @@
 
       /* Status: Incorrect (Review Mode) */
       &.status-incorrect {
-        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-        border-color: #991b1b;
+        background-color: var(--qm-danger);
+        border-color: var(--qm-danger-hover);
         color: #ffffff;
-        box-shadow: 0 2px 4px rgba(220, 38, 38, 0.25);
+        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.25);
 
         &:hover {
           filter: brightness(1.05);

@@ -6,13 +6,13 @@ import Leaderboard from '../Common/Leaderboard';
 import './ListQuiz.scss';
 
 const EMOJIS = ['⚡', '⚛️', '🚀', '🎯', '💡', '🔥', '🌟', '📚'];
-const GRADIENTS = [
-    'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
-    'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%)',
-    'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
-    'linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%)',
-    'linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%)',
-    'linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%)',
+const BG_COLORS = [
+    '#EFF6FF', // Indigo/Blue tint
+    '#F5F3FF', // Violet tint
+    '#ECFDF5', // Emerald tint
+    '#FFF7ED', // Tangerine tint
+    '#FDF2F8', // Rose tint
+    '#ECFEFF', // Cyan tint
 ];
 
 const ListQuiz = () => {
@@ -163,7 +163,7 @@ const ListQuiz = () => {
                         <div key={quiz.id || index} className="quiz-card">
                             <div
                                 className="card-banner"
-                                style={{ background: GRADIENTS[index % GRADIENTS.length] }}
+                                style={{ background: BG_COLORS[index % BG_COLORS.length] }}
                             >
                                 {quiz.image ? (
                                     <img
