@@ -252,6 +252,33 @@ const resetDemoData = async () => {
   return mockResetDemoData();
 };
 
+// ── NEW: Classes, Tips, and Blog ────────────────────────────
+const getClasses = async () => {
+  return await instance.get('/classes');
+};
+
+const joinClass = async (classId) => {
+  return await instance.post(`/classes/${classId}/join`);
+};
+
+const getMyClasses = async () => {
+  return await instance.get('/classes/mine');
+};
+
+const getTips = async (category) => {
+  const params = category && category !== 'all' ? { category } : {};
+  return await instance.get('/tips', { params });
+};
+
+const getPosts = async (tag) => {
+  const params = tag && tag !== 'all' ? { tag } : {};
+  return await instance.get('/posts', { params });
+};
+
+const getPostDetail = async (id) => {
+  return await instance.get(`/posts/${id}`);
+};
+
 export {
   postCreateUser, getAllUsers,
   putUpdateUser, deleteUser, getPageUserWithPage,
@@ -259,4 +286,6 @@ export {
   getQuestionsByQuizId, postSubmitQuiz,
   getAllQuizForAdmin, postCreateQuiz, putUpdateQuiz, deleteQuiz,
   postSaveQuestionsForQuiz, getOverview, resetDemoData,
+  getClasses, joinClass, getMyClasses,
+  getTips, getPosts, getPostDetail,
 };

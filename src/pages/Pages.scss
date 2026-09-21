@@ -392,3 +392,120 @@
   border-color: var(--qm-slate-600);
   color: var(--qm-slate-300);
 }
+
+/* ═══════════ MODALS & PREVIEWS ═══════════ */
+.page-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  animation: qm-fade-in 0.2s ease;
+}
+
+.page-modal-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-width: 580px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: qm-scale-up 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &.page-modal-lg {
+    max-width: 760px;
+  }
+
+  [data-theme='dark'] &, .dark & {
+    background: var(--qm-slate-800);
+    color: var(--qm-slate-100);
+    border: 1px solid var(--qm-slate-600);
+
+    .tip-notes {
+      background: var(--qm-slate-900) !important;
+      color: var(--qm-slate-300);
+    }
+  }
+}
+
+.page-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--qm-slate-100);
+
+  [data-theme='dark'] &, .dark & {
+    border-color: var(--qm-slate-700);
+  }
+
+  .page-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: var(--qm-slate-400);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    transition: all 0.15s ease;
+
+    &:hover {
+      background: var(--qm-slate-100);
+      color: var(--qm-slate-700);
+    }
+
+    [data-theme='dark'] &:hover, .dark &:hover {
+      background: var(--qm-slate-700);
+      color: var(--qm-slate-200);
+    }
+  }
+}
+
+.page-modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.page-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--qm-slate-100);
+
+  [data-theme='dark'] &, .dark & {
+    border-color: var(--qm-slate-700);
+  }
+}
+
+.tip-video-placeholder {
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, #1e293b 0%, #4338ca 60%, #ea580c 130%);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+}
+
+@keyframes qm-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes qm-scale-up {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}

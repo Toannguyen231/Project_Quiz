@@ -12,6 +12,9 @@ const quizzesRoutes = require('./routes/quizzes.routes');
 const questionsRoutes = require('./routes/questions.routes');
 const submissionsRoutes = require('./routes/submissions.routes');
 const statsRoutes = require('./routes/stats.routes');
+const classesRoutes = require('./routes/classes.routes');
+const tipsRoutes = require('./routes/tips.routes');
+const postsRoutes = require('./routes/posts.routes');
 const errorHandler = require('./middleware/error');
 
 const app = express();
@@ -55,6 +58,11 @@ app.use('/api/v1', quizzesRoutes);
 app.use('/api/v1', questionsRoutes);
 app.use('/api/v1', submissionsRoutes);
 app.use('/api/v1', statsRoutes);
+
+// Classes, Tips, and Posts routes
+app.use('/api/v1/classes', classesRoutes);
+app.use('/api/v1/tips', tipsRoutes);
+app.use('/api/v1/posts', postsRoutes);
 
 // Serve static frontend in production if build directory exists
 const buildPath = path.resolve(__dirname, '../build');
