@@ -135,42 +135,42 @@ const AnalyticsCharts = ({
             <div className="row g-3 mb-3">
                 {/* Metric Summary Cards */}
                 <div className="col-12 col-md-4">
-                    <div className="card shadow-sm border-0 h-100" style={{ borderRadius: '12px', background: 'linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)', color: '#fff' }}>
+                    <div className="card shadow-sm border-0 h-100" style={{ borderRadius: '12px', background: '#ffffff', border: '1px solid #e2e8f0', borderLeft: '4px solid #6366f1', color: '#0f172a' }}>
                         <div className="card-body p-3 d-flex flex-column justify-content-between">
                             <div>
-                                <span style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.85 }}>Tỉ Lệ Đạt (Pass Rate)</span>
-                                <h3 className="mb-0 mt-1 fw-bold">{summary.passRate ?? 78}%</h3>
+                                <span style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>Tỉ Lệ Đạt (Pass Rate)</span>
+                                <h3 className="mb-0 mt-1 fw-bold" style={{ color: '#6366f1' }}>{summary.passRate ?? 78}%</h3>
                             </div>
-                            <div className="mt-2" style={{ fontSize: '0.8rem', opacity: 0.85 }}>
-                                Điểm trung bình: <strong>{summary.avgScore ?? 7.6}/10</strong>
+                            <div className="mt-2" style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                                Điểm trung bình: <strong style={{ color: '#0f172a' }}>{summary.avgScore ?? 7.6}/10</strong>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="col-12 col-md-4">
-                    <div className="card shadow-sm border-0 h-100" style={{ borderRadius: '12px', background: 'linear-gradient(135deg, #059669 0%, #047857 100%)', color: '#fff' }}>
+                    <div className="card shadow-sm border-0 h-100" style={{ borderRadius: '12px', background: '#ffffff', border: '1px solid #e2e8f0', borderLeft: '4px solid #10b981', color: '#0f172a' }}>
                         <div className="card-body p-3 d-flex flex-column justify-content-between">
                             <div>
-                                <span style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.85 }}>Tổng Bài Làm Tuần Này</span>
-                                <h3 className="mb-0 mt-1 fw-bold">{counts.reduce((a, b) => a + b, 0)}</h3>
+                                <span style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>Tổng Bài Làm Tuần Này</span>
+                                <h3 className="mb-0 mt-1 fw-bold" style={{ color: '#10b981' }}>{counts.reduce((a, b) => a + b, 0)}</h3>
                             </div>
-                            <div className="mt-2" style={{ fontSize: '0.8rem', opacity: 0.85 }}>
-                                Tăng trưởng: <strong>+18.4%</strong> so với tuần trước
+                            <div className="mt-2" style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                                Tăng trưởng: <strong style={{ color: '#0f172a' }}>+18.4%</strong> so với tuần trước
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="col-12 col-md-4">
-                    <div className="card shadow-sm border-0 h-100" style={{ borderRadius: '12px', background: 'linear-gradient(135deg, #d97706 0%, #b45309 100%)', color: '#fff' }}>
+                    <div className="card shadow-sm border-0 h-100" style={{ borderRadius: '12px', background: '#ffffff', border: '1px solid #e2e8f0', borderLeft: '4px solid #ff7a2a', color: '#0f172a' }}>
                         <div className="card-body p-3 d-flex flex-column justify-content-between">
                             <div>
-                                <span style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em', opacity: 0.85 }}>Độ Khó Cân Bằng</span>
-                                <h3 className="mb-0 mt-1 fw-bold">{totalDiffCount} Bộ Đề</h3>
+                                <span style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>Độ Khó Cân Bằng</span>
+                                <h3 className="mb-0 mt-1 fw-bold" style={{ color: '#ff7a2a' }}>{totalDiffCount} Bộ Đề</h3>
                             </div>
-                            <div className="mt-2" style={{ fontSize: '0.8rem', opacity: 0.85 }}>
-                                Phân bố: <strong>{displayDifficulty.length}</strong> cấp độ khảo thí
+                            <div className="mt-2" style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                                Phân bố: <strong style={{ color: '#0f172a' }}>{displayDifficulty.length}</strong> cấp độ khảo thí
                             </div>
                         </div>
                     </div>

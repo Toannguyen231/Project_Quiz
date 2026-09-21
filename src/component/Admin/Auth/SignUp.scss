@@ -86,7 +86,7 @@
 
                 .language-text {
                     font-size: 14px;
-                    color: #333;
+                    color: var(--qm-slate-800);
                 }
             }
 
@@ -97,7 +97,7 @@
                 font-size: 14px;
 
                 span {
-                    color: #666;
+                    color: var(--qm-slate-600);
                 }
 
                 .link-button {
@@ -196,7 +196,7 @@
 
             .SignUp-tagline {
                 font-size: 18px;
-                color: #666;
+                color: var(--qm-slate-600);
                 line-height: 1.6;
                 margin-bottom: 40px;
             }
@@ -212,18 +212,18 @@
                     justify-content: center;
                     gap: 12px;
                     padding: 14px 24px;
-                    border: 1px solid #e0e0e0;
-                    border-radius: 8px;
+                    border: 1px solid var(--qm-slate-200);
+                    border-radius: var(--qm-radius-md);
                     background-color: #fff;
                     font-size: 16px;
                     font-weight: 500;
                     cursor: pointer;
                     transition: all 0.2s;
-                    color: #262627;
+                    color: var(--qm-slate-800);
 
                     &:hover {
-                        background-color: #f9f9f9;
-                        border-color: #d0d0d0;
+                        background-color: var(--qm-slate-50);
+                        border-color: var(--qm-slate-300);
                     }
 
                     &:active {
@@ -257,12 +257,12 @@
                     &::after {
                         content: '';
                         flex: 1;
-                        border-bottom: 1px solid #e0e0e0;
+                        border-bottom: 1px solid var(--qm-slate-200);
                     }
 
                     span {
                         padding: 0 16px;
-                        color: #999;
+                        color: var(--qm-slate-400);
                         font-size: 14px;
                         font-weight: 500;
                     }
@@ -271,13 +271,14 @@
                 .btn-email {
                     padding: 14px 24px;
                     border: none;
-                    border-radius: 8px;
-                    background-color: #262627;
+                    border-radius: var(--qm-radius-md);
+                    background: linear-gradient(135deg, #6366F1 0%, #FF7A2A 100%);
                     color: #fff;
                     font-size: 16px;
                     font-weight: 600;
                     cursor: pointer;
                     transition: all 0.2s;
+                    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
 
                     .loaderIcon {
                         animation: spin 1s linear infinite;
@@ -294,13 +295,15 @@
                     }
 
                     &:disabled {
-                        background-color: #dddddd !important;
-                        color: #afafaf !important;
+                        background-color: var(--qm-slate-200) !important;
+                        color: var(--qm-slate-400) !important;
                         cursor: not-allowed;
+                        box-shadow: none;
                     }
 
                     &:hover:not(:disabled) {
-                        background-color: #000;
+                        transform: translateY(-1px);
+                        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
                     }
 
                     &:active:not(:disabled) {
