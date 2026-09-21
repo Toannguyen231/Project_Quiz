@@ -1,4 +1,6 @@
 .list-quiz-page {
+  flex: 1;
+  width: 100%;
   padding: 40px 20px 80px;
   max-width: 1200px;
   margin: 0 auto;
@@ -346,28 +348,28 @@
   [data-theme='dark'] &,
   body[data-theme='dark'] & {
     .header-title {
-      color: var(--qm-slate-100);
+      color: var(--qm-text);
     }
     .header-subtitle {
-      color: var(--qm-slate-400);
+      color: var(--qm-text-muted);
     }
     .quiz-filter-bar {
-      background-color: var(--qm-slate-800);
-      border-color: var(--qm-slate-700);
+      background-color: var(--qm-surface);
+      border-color: var(--qm-border);
 
       .search-input {
-        background-color: var(--qm-slate-900);
-        border-color: var(--qm-slate-700);
-        color: var(--qm-slate-100);
+        background-color: var(--qm-bg);
+        border-color: var(--qm-border);
+        color: var(--qm-text);
       }
 
       .filter-pills .pill-btn {
-        background-color: var(--qm-slate-900);
-        border-color: var(--qm-slate-700);
-        color: var(--qm-slate-300);
+        background-color: var(--qm-bg);
+        border-color: var(--qm-border);
+        color: var(--qm-text-muted);
 
         &:hover {
-          background-color: var(--qm-slate-700);
+          background-color: var(--qm-border);
           color: #ffffff;
         }
 
@@ -380,8 +382,8 @@
     }
 
     .quiz-card {
-      background-color: var(--qm-slate-800);
-      border-color: var(--qm-slate-700);
+      background-color: var(--qm-surface);
+      border-color: var(--qm-border);
 
       .card-banner {
         opacity: 0.92;
@@ -389,33 +391,33 @@
 
       .card-content {
         .quiz-title {
-          color: var(--qm-slate-100);
+          color: var(--qm-text);
         }
         .quiz-description {
-          color: var(--qm-slate-400);
+          color: var(--qm-text-muted);
         }
         .quiz-meta-tags .meta-tag {
-          background-color: var(--qm-slate-700);
-          color: var(--qm-slate-300);
+          background-color: var(--qm-border);
+          color: var(--qm-text-muted);
         }
       }
     }
 
     .quiz-empty-state {
-      background-color: var(--qm-slate-800);
-      border-color: var(--qm-slate-700);
+      background-color: var(--qm-surface);
+      border-color: var(--qm-border);
 
       .empty-title {
-        color: var(--qm-slate-100);
+        color: var(--qm-text);
       }
       .empty-desc {
-        color: var(--qm-slate-400);
+        color: var(--qm-text-muted);
       }
     }
 
     .quiz-skeleton-card {
-      background-color: var(--qm-slate-800);
-      border-color: var(--qm-slate-700);
+      background-color: var(--qm-surface);
+      border-color: var(--qm-border);
 
       .skeleton-banner,
       .skeleton-line {

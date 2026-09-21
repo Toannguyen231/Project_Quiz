@@ -234,3 +234,85 @@
     }
   }
 }
+
+[data-theme='dark'],
+.dark {
+  .nnt-leaderboard-card {
+    background: var(--qm-surface, #1e293b);
+    border-color: rgba(249, 115, 22, 0.25);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+    .leaderboard-header {
+      border-bottom-color: var(--qm-border, #334155);
+
+      .header-title-wrap {
+        .leaderboard-title {
+          color: var(--qm-text, #f8fafc);
+        }
+
+        .leaderboard-subtitle {
+          color: var(--qm-text-muted, #94a3b8);
+        }
+      }
+
+      .period-tabs {
+        background: var(--qm-bg, #0f172a);
+
+        .tab-btn {
+          color: var(--qm-text-muted, #94a3b8);
+
+          &.active {
+            background: var(--qm-surface, #1e293b);
+            color: #fb923c;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+          }
+
+          &:hover:not(.active) {
+            color: var(--qm-text, #f8fafc);
+          }
+        }
+      }
+    }
+
+    .leaderboard-list {
+      .leaderboard-item {
+        background: var(--qm-bg, #0f172a);
+        border-color: var(--qm-border, #334155);
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.03);
+          border-color: var(--qm-primary, #f97316);
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+        }
+
+        &.top-1-item {
+          background: rgba(245, 158, 11, 0.1);
+          border-color: rgba(245, 158, 11, 0.35);
+        }
+
+        .student-info {
+          .name-row {
+            .student-name {
+              color: var(--qm-text, #f8fafc);
+            }
+
+            .student-title-pill {
+              background: rgba(59, 130, 246, 0.15);
+              color: #93c5fd;
+              border-color: rgba(59, 130, 246, 0.3);
+            }
+          }
+
+          .sub-stats {
+            color: var(--qm-text-muted, #94a3b8);
+
+            strong {
+              color: var(--qm-text, #cbd5e1);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
