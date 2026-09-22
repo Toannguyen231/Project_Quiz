@@ -296,7 +296,7 @@ Hệ thống tự động kích hoạt quy trình kiểm tra mã nguồn thông 
 
 [![GitHub](https://img.shields.io/badge/GitHub-Toannguyen231-181717?style=flat-square&logo=github)](https://github.com/Toannguyen231)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Toan_Nguyen-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/toannguyen231)
-[![Email](https://img.shields.io/badge/Email-nguyenngoctoan231@gmail.com-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:nguyenngoctoan231@gmail.com)
+[![Email](https://img.shields.io/badge/Email-ngoctoann06@gmail.com-D14836?style=flat-square&logo=gmail&logoColor=white)](mailto:ngoctoann06@gmail.com)
 
 *Đóng góp ý kiến hoặc báo lỗi, vui lòng mở một [Issue](https://github.com/Toannguyen231/Project_Quiz/issues) hoặc gửi Pull Request!*
 
