@@ -154,7 +154,7 @@ const MascotCompanion = () => {
         return text.split('\n').map((line, idx) => {
             const parts = line.split(/(\*\*.*?\*\*)/g);
             return (
-                <div key={idx} style={{ minHeight: line ? 'auto' : '8px' }}>
+                <div key={idx} style={{ minHeight: line ? 'auto' : '8px' }}>git commit -m "feat: revamp UI/UX, upgrade quiz engine with auto-save, gamification and Quizzy AI"
                     {parts.map((part, pIdx) => {
                         if (part.startsWith('**') && part.endsWith('**')) {
                             return <strong key={pIdx}>{part.slice(2, -2)}</strong>;

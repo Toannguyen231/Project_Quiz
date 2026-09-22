@@ -8,11 +8,8 @@ export default function useDarkMode() {
         try {
             const saved = localStorage.getItem(THEME_KEY);
             if (saved) return saved;
-            if (typeof window.matchMedia === 'function') {
-                return window.matchMedia('(prefers-color-scheme: dark)')?.matches ? 'dark' : 'light';
-            }
         } catch (e) {
-            // ignore localStorage / matchMedia errors in constrained environments
+            // ignore localStorage errors in constrained environments
         }
         return 'light';
     });
