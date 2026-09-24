@@ -51,7 +51,6 @@ const DetailQuiz = () => {
     } = useExamProgress(quizId, userId);
 
     // Time spent tracking
-    const startTimeRef = useRef(Date.now());
     const finalTimeSpentRef = useRef(null);
 
     // Forward declaration of handleFinish
@@ -63,11 +62,9 @@ const DetailQuiz = () => {
         timeLeft,
         formattedTime,
         timerStatus,
-        isWarning,
         isDanger,
         tabSwitchCount,
         pauseTimer,
-        resumeTimer,
         setTimeLeft,
     } = useTimer({
         initialSeconds: totalDurationSeconds,
@@ -254,11 +251,9 @@ const DetailQuiz = () => {
         });
 
         // Try submitting to Backend API
-        let apiSucceeded = false;
         try {
             const res = await postSubmitQuiz(payload);
             if (res && res.data && res.data.EC === 0) {
-                apiSucceeded = true;
                 const dt = res.data.DT;
 
                 // Merge server results with question data for review mode
