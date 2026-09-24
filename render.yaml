@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: nnt-academy-backend
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: npm install
+    startCommand: npm run server
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CLIENT_URL
+        value: https://nnt-academy.vercel.app

@@ -5,8 +5,12 @@ import { store } from '../actions/store';
 import { refreshTokenSuccess, userLogout } from '../actions/Actions';
 
 // Create configured Axios instance
+const API_BASE = process.env.REACT_APP_API_URL
+    ? `${process.env.REACT_APP_API_URL.replace(/\/$/, '')}/api/v1`
+    : '/api/v1';
+
 const instance = axios.create({
-    baseURL: '/api/v1',
+    baseURL: API_BASE,
     timeout: 15000,
     withCredentials: true,
 });
